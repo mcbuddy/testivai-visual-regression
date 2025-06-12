@@ -6,18 +6,49 @@ import { compareScreenshots } from '../../../src/compare';
 import { ComparisonResult } from '../../../src/core/interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
+import { PNG } from 'pngjs';
 
 // Mock dependencies
 jest.mock('fs');
 jest.mock('path');
+jest.mock('pngjs', () => {
+  return {
+    PNG: class MockPNG {
+      width = 100;
+      height = 100;
+      data = Buffer.alloc(100 * 100 * 4);
+      
+      constructor(options: { width?: number; height?: number } = {}) {
+        if (options.width) this.width = options.width;
+        if (options.height) this.height = options.height;
+      }
+      
+      static sync: {
+        read: jest.Mock;
+        write: jest.Mock;
+      } = {
+        read: jest.fn().mockImplementation(() => {
+          return { width: 100, height: 100, data: Buffer.alloc(100 * 100 * 4) };
+        }),
+        write: jest.fn().mockImplementation(() => Buffer.from('mock-png-data'))
+      };
+    }
+  };
+});
 
 // Mock pixelmatch
-const mockPixelmatch = jest.fn();
-jest.mock('pixelmatch', () => mockPixelmatch);
+jest.mock('pixelmatch', () => {
+  return jest.fn().mockImplementation(() => 100);
+});
+
+// Get the mocked pixelmatch function
+const mockPixelmatch = jest.requireMock('pixelmatch');
 
 describe('Screenshot Comparison', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset the mock implementation for each test
+    mockPixelmatch.mockImplementation(() => 1001);
   });
   
   describe('compareScreenshots', () => {
@@ -34,11 +65,13 @@ describe('Screenshot Comparison', () => {
       // Mock fs.existsSync to return true
       (fs.existsSync as jest.Mock).mockReturnValue(true);
       
-      // Mock pixelmatch to return a diff count
-      mockPixelmatch.mockReturnValue(100);
-      
       // Mock path.dirname to return the directory
       (path.dirname as jest.Mock).mockReturnValue('/path/to');
+      
+      // Mock path.basename to return the filename without extension
+      (path.basename as jest.Mock).mockImplementation((filePath, ext) => {
+        return 'test-screenshot';
+      });
       
       const options = {
         baselinePath: '/path/to/baseline.png',
@@ -55,7 +88,7 @@ describe('Screenshot Comparison', () => {
       expect(fs.writeFileSync).toHaveBeenCalledWith(options.diffPath, expect.any(Buffer));
       
       expect(result).toEqual({
-        name: path.basename(options.baselinePath, '.png'),
+        name: 'test-screenshot',
         baselinePath: options.baselinePath,
         comparePath: options.comparePath,
         diffPath: options.diffPath,
@@ -111,13 +144,15 @@ describe('Screenshot Comparison', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(true);
       
       // Mock pixelmatch to return a small diff count
-      mockPixelmatch.mockReturnValue(10);
+      mockPixelmatch.mockImplementation(() => 10);
       
       // Mock path.dirname to return the directory
       (path.dirname as jest.Mock).mockReturnValue('/path/to');
       
       // Mock path.basename to return the filename without extension
-      (path.basename as jest.Mock).mockReturnValue('test-screenshot');
+      (path.basename as jest.Mock).mockImplementation((filePath, ext) => {
+        return 'test-screenshot';
+      });
       
       const options = {
         baselinePath: '/path/to/baseline.png',

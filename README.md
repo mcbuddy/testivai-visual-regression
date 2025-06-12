@@ -97,6 +97,10 @@ console.log(`Report available at: ${reportPath}`);
 
 For more detailed documentation, see the [docs](./docs) directory.
 
+## For Developers
+
+If you want to use this package as a library in your own project or contribute to its development, see [PUBLISHING.md](./PUBLISHING.md) for detailed instructions on how to publish and use this package as a Node.js library.
+
 ## License
 
 MIT
