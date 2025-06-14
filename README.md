@@ -100,6 +100,16 @@ testivai/
 - Node.js (v16+)
 - npm or yarn
 
+### Development Tools
+
+This project is developed using:
+
+- **[Cline](https://github.com/cline/cline)** - AI-powered coding assistant extension for VS Code
+- **[Anthropic Claude](https://www.anthropic.com/claude)** - Advanced AI model for code generation and analysis
+- **VS Code** - Primary development environment with Cline extension
+
+The combination of Cline and Claude enables rapid development, comprehensive testing, and high-quality code generation while maintaining best practices and architectural consistency.
+
 ### Setup
 
 ```bash
