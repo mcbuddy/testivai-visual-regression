@@ -66,12 +66,12 @@ export class testivAI {
   
   /**
    * Capture a screenshot
-   * @param name Name of the screenshot
+   * @param name Name of the screenshot (optional - will be generated from URL if not provided)
    * @param target Framework-specific target (page, browser, etc.)
    * @param options Screenshot options
    * @returns Path to the captured screenshot
    */
-  public async capture(name: string, target: unknown, options?: ScreenshotOptions): Promise<string> {
+  public async capture(name: string | undefined, target: unknown, options?: ScreenshotOptions): Promise<string> {
     if (!this.plugin) {
       throw new Error(`No plugin registered for framework ${this.options.framework}`);
     }

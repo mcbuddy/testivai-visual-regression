@@ -1,106 +1,184 @@
 # TestiVAI Visual Regression
 
-A TypeScript SDK for visual regression testing that integrates with multiple testing frameworks.
+A comprehensive TypeScript SDK and CLI for visual regression testing that integrates with multiple testing frameworks.
 
-## Features
+## Packages
 
-- Cross-browser screenshot capture
-- Integration with Playwright, Cypress, Puppeteer, and Selenium
-- Git branch-based comparison
-- Interactive HTML reports with Accept/Reject functionality
-- Customizable configuration
+This monorepo contains two packages:
 
-## Installation
+### 📦 [testivai-visual-regression](./packages/testivai-visual-regression)
+
+The core SDK for visual regression testing.
 
 ```bash
 npm install testivai-visual-regression
 ```
 
+**Features:**
+- Multi-framework support (Playwright, Cypress, Puppeteer, Selenium)
+- TypeScript support with comprehensive type definitions
+- Plugin architecture for framework-specific integrations
+- Cross-browser screenshot capture
+- Flexible configuration options
+
+### 🔧 [testivai-cli](./packages/testivai-cli)
+
+Command-line interface for TestiVAI Visual Regression.
+
+```bash
+npm install -g testivai-cli
+```
+
+**Features:**
+- Initialize projects with `testivai init`
+- Compare screenshots with `testivai compare`
+- Update baselines with `--update-baselines`
+- Comprehensive help system
+
 ## Quick Start
 
-### Playwright
+### 1. Install the CLI (optional)
+
+```bash
+npm install -g testivai-cli
+```
+
+### 2. Install the SDK
+
+```bash
+npm install testivai-visual-regression
+```
+
+### 3. Initialize your project (using CLI)
+
+```bash
+testivai init --framework playwright
+```
+
+### 4. Use in your tests (SDK)
 
 ```typescript
 import { test } from '@playwright/test';
-import { TestiVAI } from 'testivai-visual-regression';
+import { testivAI } from 'testivai-visual-regression';
 import { playwrightPlugin } from 'testivai-visual-regression/plugins/playwright';
 
-// Initialize TestiVAI
-const visualTest = TestiVAI.init({
+const visualTest = testivAI.init({
   framework: 'playwright',
   baselineDir: '.testivai/visual-regression/baseline'
 });
 
 visualTest.use(playwrightPlugin());
 
-// Use in your tests
 test('homepage visual test', async ({ page }) => {
   await page.goto('https://example.com');
   await visualTest.capture('homepage', page);
 });
 ```
 
-### Cypress
+### 5. Compare results (using CLI)
 
-```javascript
-// cypress/support/e2e.js
-import { TestiVAI } from 'testivai-visual-regression';
-import { cypressPlugin } from 'testivai-visual-regression/plugins/cypress';
-
-const visualTest = TestiVAI.init({
-  framework: 'cypress',
-  baselineDir: '.testivai/visual-regression/baseline'
-});
-
-visualTest.use(cypressPlugin());
-
-// Add custom command
-Cypress.Commands.add('compareScreenshot', (name) => {
-  return visualTest.capture(name);
-});
-
-// In test file
-describe('Visual Tests', () => {
-  it('should match homepage visual baseline', () => {
-    cy.visit('/');
-    cy.compareScreenshot('homepage');
-  });
-});
+```bash
+testivai compare
 ```
 
-## Configuration
+## Architecture
 
-Create a `testivai.config.js` file in your project root:
-
-```javascript
-module.exports = {
-  baselineDir: '.testivai/visual-regression/baseline',
-  compareDir: '.testivai/visual-regression/compare',
-  reportDir: '.testivai/visual-regression/reports',
-  diffThreshold: 0.1,
-  ignoreRegions: [
-    { name: 'date-display', selector: '.date-time' }
-  ]
-};
+```
+testivai/
+├── packages/
+│   ├── testivai-visual-regression/     # Core SDK: capture, compare, plugins
+│   └── testivai-cli/                   # CLI layer that calls into SDK
+├── .gitignore
+├── package.json (root, with workspaces config)
+└── README.md
 ```
 
-## Viewing Reports
+## Development
 
-Reports are automatically generated after test runs. You can access them programmatically:
+### Prerequisites
 
-```javascript
-const reportPath = await visualTest.generateReport();
-console.log(`Report available at: ${reportPath}`);
+- Node.js (v16+)
+- npm or yarn
+
+### Setup
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd testivai
+
+# Install dependencies for all packages
+npm install
+
+# Build all packages
+npm run build
+
+# Run tests for all packages
+npm test
 ```
+
+### Working with Packages
+
+```bash
+# Build specific package
+npm run build --workspace=packages/testivai-visual-regression
+
+# Test specific package
+npm run test --workspace=packages/testivai-cli
+
+# Lint all packages
+npm run lint
+```
+
+## Supported Testing Frameworks
+
+- **Playwright** - Full support with native integration
+- **Cypress** - Custom commands and plugin architecture
+- **Puppeteer** - Page event listeners and custom hooks
+- **Selenium** - WebDriver extensions and event listeners
+
+## Features
+
+### Core SDK Features
+
+- 🎯 **Multi-Framework Support**: Works seamlessly with popular testing frameworks
+- 🔧 **Plugin Architecture**: Extensible system for framework-specific integrations
+- 📸 **Cross-Browser Screenshots**: Consistent capture across different browsers
+- ⚙️ **Flexible Configuration**: Customizable thresholds, directories, and options
+- 📝 **TypeScript Support**: Full type safety and IntelliSense support
+- 🔄 **Git Integration**: Branch-based comparison workflows (planned)
+- 📊 **HTML Reports**: Interactive reports for reviewing differences (planned)
+
+### CLI Features
+
+- 🚀 **Quick Setup**: Initialize projects with a single command
+- 📋 **Comprehensive Commands**: Init, compare, and help commands
+- ⚙️ **Flexible Options**: Customizable settings for different workflows
+- 🎨 **Colored Output**: Enhanced terminal experience with chalk
+- 📖 **Built-in Help**: Detailed help for all commands and options
 
 ## Documentation
 
-For more detailed documentation, see the [docs](./docs) directory.
+- [SDK Documentation](./packages/testivai-visual-regression/README.md)
+- [CLI Documentation](./packages/testivai-cli/README.md)
+- [Publishing Guide](./PUBLISHING.md)
 
-## For Developers
+## Contributing
 
-If you want to use this package as a library in your own project or contribute to its development, see [PUBLISHING.md](./PUBLISHING.md) for detailed instructions on how to publish and use this package as a Node.js library.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for your changes
+5. Ensure all tests pass
+6. Submit a pull request
 
 ## License
 
 MIT
+
+## Support
+
+For issues and questions:
+- Create an issue in this repository
+- Check the documentation in each package
+- Review the examples in the package READMEs

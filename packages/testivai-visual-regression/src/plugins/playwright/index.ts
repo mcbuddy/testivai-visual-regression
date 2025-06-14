@@ -12,6 +12,7 @@ import { getCurrentBranch } from '../../core/utils';
 interface PlaywrightPage {
   screenshot(options?: PlaywrightScreenshotOptions): Promise<Buffer>;
   locator?(selector: string): PlaywrightLocator;
+  url(): string;
 }
 
 /**
@@ -69,11 +70,23 @@ export const playwrightPlugin = (pluginOptions: PlaywrightPluginOptions = {}): P
       }
     },
     
-    async capture(name: string, page: unknown, options?: ScreenshotOptions): Promise<string> {
+    async capture(name: string | undefined, page: unknown, options?: ScreenshotOptions): Promise<string> {
       const playwrightPage = page as PlaywrightPage;
       
       if (!playwrightPage || typeof playwrightPage.screenshot !== 'function') {
         throw new Error('Invalid Playwright page object provided. Expected page with screenshot method.');
+      }
+
+      // Generate filename from URL path if name is not provided
+      let screenshotName = name;
+      if (!screenshotName) {
+        try {
+          const currentUrl = playwrightPage.url();
+          screenshotName = generateFilenameFromUrl(currentUrl);
+        } catch (error) {
+          // Fallback to timestamp if URL is not available
+          screenshotName = `screenshot-${Date.now()}`;
+        }
       }
 
       // Get current branch if not provided
@@ -103,7 +116,7 @@ export const playwrightPlugin = (pluginOptions: PlaywrightPluginOptions = {}): P
         baselineDir: pluginOptions.baselineDir || '.testivai/visual-regression/baseline',
         compareDir: pluginOptions.compareDir,
         framework: 'playwright',
-        name,
+        name: screenshotName,
         branch,
         isBaseline: pluginOptions.isBaseline || false,
         target,
@@ -112,6 +125,48 @@ export const playwrightPlugin = (pluginOptions: PlaywrightPluginOptions = {}): P
     }
   };
 };
+
+/**
+ * Generate a filename from URL path
+ */
+function generateFilenameFromUrl(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    let pathname = urlObj.pathname;
+    
+    // Remove leading slash and replace slashes with dashes
+    pathname = pathname.replace(/^\//, '').replace(/\//g, '-');
+    
+    // If pathname is empty, use the hostname
+    if (!pathname || pathname === '') {
+      pathname = urlObj.hostname.replace(/\./g, '-');
+    }
+    
+    // Remove or replace invalid filename characters
+    pathname = pathname.replace(/[<>:"/\\|?*]/g, '-');
+    
+    // Remove multiple consecutive dashes
+    pathname = pathname.replace(/-+/g, '-');
+    
+    // Remove trailing dashes
+    pathname = pathname.replace(/-$/, '');
+    
+    // If still empty, use default
+    if (!pathname) {
+      pathname = 'page';
+    }
+    
+    // Ensure it ends with .png
+    if (!pathname.endsWith('.png')) {
+      pathname = pathname.replace(/\.(jpg|jpeg|gif|bmp|webp)$/i, '') + '.png';
+    }
+    
+    return pathname;
+  } catch (error) {
+    // If URL parsing fails, return a safe default
+    return 'page.png';
+  }
+}
 
 /**
  * Convert TestiVAI screenshot options to Playwright-specific options

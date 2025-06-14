@@ -29,20 +29,26 @@ test.describe('Visual Regression Tests', () => {
     // Wait for page to load
     await page.waitForLoadState('networkidle');
     
-    // Capture full page screenshot
+    // Capture full page screenshot with custom name
     await visualTest.capture('homepage-full', page, {
       fullPage: true
     });
     
-    // Capture viewport screenshot
+    // Capture viewport screenshot with custom name
     await visualTest.capture('homepage-viewport', page, {
       fullPage: false
     });
     
-    // Capture specific element
+    // Capture specific element with custom name
     await visualTest.capture('homepage-header', page, {
       selector: 'header',
       fullPage: false
+    });
+    
+    // Capture screenshot using URL path as filename (no name provided)
+    // This will create a screenshot named "example-com.png"
+    await visualTest.capture(undefined, page, {
+      fullPage: true
     });
     
     // Continue with other test assertions

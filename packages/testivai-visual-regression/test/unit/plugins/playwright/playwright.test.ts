@@ -194,6 +194,81 @@ describe('Playwright Plugin', () => {
         );
       });
 
+      it('should generate filename from URL when name is not provided', async () => {
+        const plugin = playwrightPlugin();
+        const mockPageWithUrl = {
+          ...mockPage,
+          url: jest.fn().mockReturnValue('https://example.com/products/shoes')
+        };
+
+        // Mock captureScreenshot to call the target.screenshot function
+        mockCaptureScreenshot.mockImplementation(async (options) => {
+          await options.target.screenshot();
+          return '/path/to/screenshot.png';
+        });
+
+        await plugin.capture(undefined, mockPageWithUrl);
+
+        expect(mockCaptureScreenshot).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: 'products-shoes.png'
+          })
+        );
+      });
+
+      it('should use hostname when URL path is empty', async () => {
+        const plugin = playwrightPlugin();
+        const mockPageWithUrl = {
+          ...mockPage,
+          url: jest.fn().mockReturnValue('https://example.com/')
+        };
+
+        // Mock captureScreenshot to call the target.screenshot function
+        mockCaptureScreenshot.mockImplementation(async (options) => {
+          await options.target.screenshot();
+          return '/path/to/screenshot.png';
+        });
+
+        await plugin.capture(undefined, mockPageWithUrl);
+
+        expect(mockCaptureScreenshot).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: 'example-com.png'
+          })
+        );
+      });
+
+      it('should fallback to timestamp when URL is not available', async () => {
+        const plugin = playwrightPlugin();
+        const mockPageWithoutUrl = {
+          ...mockPage,
+          url: jest.fn().mockImplementation(() => {
+            throw new Error('URL not available');
+          })
+        };
+
+        // Mock captureScreenshot to call the target.screenshot function
+        mockCaptureScreenshot.mockImplementation(async (options) => {
+          await options.target.screenshot();
+          return '/path/to/screenshot.png';
+        });
+
+        // Mock Date.now to get predictable timestamp
+        const mockTimestamp = 1234567890;
+        jest.spyOn(Date, 'now').mockReturnValue(mockTimestamp);
+
+        await plugin.capture(undefined, mockPageWithoutUrl);
+
+        expect(mockCaptureScreenshot).toHaveBeenCalledWith(
+          expect.objectContaining({
+            name: `screenshot-${mockTimestamp}`
+          })
+        );
+
+        // Restore Date.now
+        jest.restoreAllMocks();
+      });
+
       it('should throw error for invalid page object', async () => {
         const plugin = playwrightPlugin();
         const invalidPage = {};

@@ -74,11 +74,11 @@ export interface Plugin {
   
   /**
    * Capture a screenshot using the framework-specific implementation
-   * @param name Name of the screenshot
+   * @param name Name of the screenshot (optional - will be generated from URL if not provided)
    * @param target Framework-specific target (page, browser, etc.)
    * @param options Screenshot options
    */
-  capture(name: string, target: unknown, options?: ScreenshotOptions): Promise<string>;
+  capture(name: string | undefined, target: unknown, options?: ScreenshotOptions): Promise<string>;
 }
 
 /**

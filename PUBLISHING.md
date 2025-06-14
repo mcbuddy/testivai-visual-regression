@@ -1,6 +1,6 @@
-# Publishing TestiVAI Visual Regression
+# Publishing testivAI Visual Regression
 
-This document explains how to publish the TestiVAI Visual Regression package to npm and how to use it as a Node.js library.
+This document explains how to publish the testivAI Visual Regression package to npm and how to use it as a Node.js library.
 
 ## Preparing for Publishing
 
@@ -56,10 +56,10 @@ yarn add testivai-visual-regression
 Here's how to use the package in a Node.js application:
 
 ```typescript
-import { TestiVAI } from 'testivai-visual-regression';
+import { testivAI } from 'testivai-visual-regression';
 
-// Initialize TestiVAI
-const visualTest = TestiVAI.init({
+// Initialize testivAI
+const visualTest = testivAI.init({
   framework: 'playwright', // or 'cypress', 'puppeteer', 'selenium'
   baselineDir: '.testivai/visual-regression/baseline',
   compareDir: '.testivai/visual-regression/compare',
@@ -72,13 +72,13 @@ const visualTest = TestiVAI.init({
 ### Using with Playwright
 
 ```typescript
-import { TestiVAI } from 'testivai-visual-regression';
+import { testivAI } from 'testivai-visual-regression';
 import { playwrightPlugin } from 'testivai-visual-regression/plugins/playwright';
 import { chromium } from 'playwright';
 
 async function runTest() {
-  // Initialize TestiVAI
-  const visualTest = TestiVAI.init({
+  // Initialize testivAI
+  const visualTest = testivAI.init({
     framework: 'playwright',
     baselineDir: '.testivai/visual-regression/baseline'
   });
@@ -112,10 +112,10 @@ runTest().catch(console.error);
 
 ```javascript
 // In your Cypress support file
-import { TestiVAI } from 'testivai-visual-regression';
+import { testivAI } from 'testivai-visual-regression';
 import { cypressPlugin } from 'testivai-visual-regression/plugins/cypress';
 
-const visualTest = TestiVAI.init({
+const visualTest = testivAI.init({
   framework: 'cypress',
   baselineDir: '.testivai/visual-regression/baseline'
 });
@@ -131,13 +131,13 @@ Cypress.Commands.add('compareScreenshot', (name) => {
 ### Using with Puppeteer
 
 ```typescript
-import { TestiVAI } from 'testivai-visual-regression';
+import { testivAI } from 'testivai-visual-regression';
 import { puppeteerPlugin } from 'testivai-visual-regression/plugins/puppeteer';
 import puppeteer from 'puppeteer';
 
 async function runTest() {
-  // Initialize TestiVAI
-  const visualTest = TestiVAI.init({
+  // Initialize testivAI
+  const visualTest = testivAI.init({
     framework: 'puppeteer',
     baselineDir: '.testivai/visual-regression/baseline'
   });
@@ -166,13 +166,13 @@ runTest().catch(console.error);
 ### Using with Selenium
 
 ```typescript
-import { TestiVAI } from 'testivai-visual-regression';
+import { testivAI } from 'testivai-visual-regression';
 import { seleniumPlugin } from 'testivai-visual-regression/plugins/selenium';
 import { Builder } from 'selenium-webdriver';
 
 async function runTest() {
-  // Initialize TestiVAI
-  const visualTest = TestiVAI.init({
+  // Initialize testivAI
+  const visualTest = testivAI.init({
     framework: 'selenium',
     baselineDir: '.testivai/visual-regression/baseline'
   });
@@ -199,7 +199,7 @@ runTest().catch(console.error);
 
 ## Configuration
 
-You can create a configuration file to customize the behavior of TestiVAI:
+You can create a configuration file to customize the behavior of testivAI:
 
 ```javascript
 // testivai.config.js

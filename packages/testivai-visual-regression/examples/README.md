@@ -49,6 +49,21 @@ await page.setViewportSize({ width: 1920, height: 1080 });
 await visualTest.capture('homepage-desktop', page);
 ```
 
+#### 4. Automatic Filename Generation
+```typescript
+// Navigate to https://example.com/products/shoes
+await page.goto('https://example.com/products/shoes');
+
+// Capture without providing a name - filename will be "products-shoes.png"
+await visualTest.capture(undefined, page, {
+  fullPage: true
+});
+
+// For homepage (https://example.com/), filename will be "example-com.png"
+await page.goto('https://example.com/');
+await visualTest.capture(undefined, page);
+```
+
 ### Screenshot Organization
 
 Screenshots are automatically organized in the following structure:
