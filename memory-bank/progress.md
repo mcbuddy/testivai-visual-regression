@@ -71,14 +71,18 @@ The following components have been implemented and are working across both packa
 
 While the monorepo transformation and Playwright implementation are complete, there are still components that need to be implemented:
 
-### 1. Git Integration (0% Complete)
+### 1. Git Integration ✅ (100% Complete)
 
-- [ ] Unit tests for branch detection
-- [ ] Branch detection (TDD)
-- [ ] Unit tests for branch-specific storage
-- [ ] Branch-specific storage paths (TDD)
-- [ ] Unit tests for baseline management
-- [ ] Baseline management workflow (TDD)
+- [x] Unit tests for branch detection ✅
+- [x] Branch detection (TDD) ✅
+- [x] Unit tests for branch-specific storage ✅
+- [x] Branch-specific storage paths (TDD) ✅
+- [x] Unit tests for baseline management ✅
+- [x] Baseline management workflow (TDD) ✅
+- [x] Git information extraction ✅
+- [x] Factory functions for easy integration ✅
+- [x] Comprehensive error handling ✅
+- [x] 60 comprehensive tests across 4 test suites ✅
 
 ### 2. HTML Report Generator ✅ (100% Complete)
 
@@ -249,10 +253,10 @@ The monorepo transformation has resolved several architectural issues while main
 - **Success Criteria**: Full configuration system with environment support
 - **Status**: 25% Complete
 
-### 📋 Milestone 8: Git Integration
+### ✅ Milestone 8: Git Integration
 - **Target**: Implement Git branch-based comparison with TDD
 - **Success Criteria**: Able to detect Git branches and manage baselines accordingly
-- **Status**: Not Started
+- **Status**: Completed ✅
 
 ### ✅ Milestone 9: HTML Report Generator
 - **Target**: Implement interactive HTML reports with TDD
@@ -276,19 +280,24 @@ The monorepo transformation has resolved several architectural issues while main
 
 ## Current Test Status
 
-**Total Tests**: 73 tests across both packages (significantly expanded)
+**Total Tests**: 133 tests across both packages (significantly expanded with Git integration)
 
 ### testivai-visual-regression Package
-- **Tests**: 65 tests across 7 test suites (expanded with Playwright plugin)
-- **Coverage**: 94.73% statements, 93.33% branches, 80% functions, 94.73% lines
+- **Tests**: 125 tests across 11 test suites (expanded with Git integration)
+- **Coverage**: 100% statements for git-integration.ts, 94.73% overall
 - **Test Categories**:
   - Core interfaces and types
   - Screenshot capture functionality
   - Screenshot comparison algorithms
   - Utility functions
   - Main testivAI class
-  - Report generation (24 additional tests)
-  - **Playwright plugin (21 new tests)**
+  - Report generation (24 tests)
+  - Playwright plugin (21 tests)
+  - **Git integration (60 new tests across 4 test suites)**
+    - Basic functionality (11 tests)
+    - Git information extraction (13 tests)
+    - Baseline management (23 tests)
+    - Factory functions and integration (13 tests)
 
 ### testivai-cli Package
 - **Tests**: 8 tests across 1 test suite
