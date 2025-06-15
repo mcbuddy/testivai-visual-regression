@@ -75,16 +75,17 @@ export async function loadConfigFromFile(filePath: string): Promise<Partial<test
 function resolveConfigPaths(config: Partial<testivAIOptions>): Partial<testivAIOptions> {
   const resolved = { ...config };
   
-  if (resolved.baselineDir) {
-    resolved.baselineDir = path.resolve(resolved.baselineDir);
+  // Only resolve paths that are explicitly provided in the config
+  if (resolved.baselineDir !== undefined) {
+    resolved.baselineDir = path.resolve(resolved.baselineDir as string);
   }
   
-  if (resolved.compareDir) {
-    resolved.compareDir = path.resolve(resolved.compareDir);
+  if (resolved.compareDir !== undefined) {
+    resolved.compareDir = path.resolve(resolved.compareDir as string);
   }
   
-  if (resolved.reportDir) {
-    resolved.reportDir = path.resolve(resolved.reportDir);
+  if (resolved.reportDir !== undefined) {
+    resolved.reportDir = path.resolve(resolved.reportDir as string);
   }
   
   return resolved;

@@ -432,8 +432,8 @@ describe('Environment Configuration', () => {
       const result = createEnvironmentAwareConfig(frameworkConfig);
       
       expect(result.framework).toBe('playwright');
-      expect(result.playwright?.timeout).toBe(5000);
-      expect(result.playwright?.disableAnimations).toBe(true);
+      expect((result as any).playwright?.timeout).toBe(5000);
+      expect((result as any).playwright?.disableAnimations).toBe(true);
       expect(result.environment).toBe('test');
       expect(result.parallel).toBe(true); // from test environment
     });

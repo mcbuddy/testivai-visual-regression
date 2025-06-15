@@ -14,11 +14,12 @@ import {
   createFrameworkConfig
 } from '../../../src/config/framework-loader';
 import { FrameworkType } from '../../../src/core/interfaces';
+import { PlaywrightConfig } from '../../../src/config/playwright';
 
 describe('Framework Configuration Loader', () => {
   describe('getFrameworkDefaultConfig', () => {
     it('should return Playwright default config', () => {
-      const config = getFrameworkDefaultConfig('playwright');
+      const config = getFrameworkDefaultConfig('playwright') as PlaywrightConfig;
       
       expect(config.framework).toBe('playwright');
       expect(config.baselineDir).toBe('.testivai/baseline');
@@ -126,7 +127,7 @@ describe('Framework Configuration Loader', () => {
         }
       };
       
-      const result = mergeFrameworkConfig('playwright', config);
+      const result = mergeFrameworkConfig('playwright', config) as PlaywrightConfig;
       
       expect(result.framework).toBe('playwright');
       expect(result.diffThreshold).toBe(0.2);
@@ -177,7 +178,7 @@ describe('Framework Configuration Loader', () => {
         }
       };
       
-      const result = loadFrameworkConfig('playwright', config);
+      const result = loadFrameworkConfig('playwright', config) as PlaywrightConfig;
       
       expect(result.framework).toBe('playwright');
       expect(result.diffThreshold).toBe(0.2);
@@ -352,7 +353,7 @@ describe('Framework Configuration Loader', () => {
         diffThreshold: 0.2
       };
       
-      const result = createFrameworkConfig(config);
+      const result = createFrameworkConfig(config) as PlaywrightConfig;
       
       expect(result.framework).toBe('playwright');
       expect(result.diffThreshold).toBe(0.2);
@@ -437,7 +438,7 @@ describe('Framework Configuration Loader', () => {
       expect(validation.isValid).toBe(true);
       
       // Load configuration
-      const result = loadFrameworkConfig('playwright', config);
+      const result = loadFrameworkConfig('playwright', config) as PlaywrightConfig;
       expect(result.framework).toBe('playwright');
       expect(result.diffThreshold).toBe(0.2);
       expect(result.playwright?.timeout).toBe(10000);
@@ -448,7 +449,7 @@ describe('Framework Configuration Loader', () => {
     it('should work with minimal configuration', () => {
       const config = {};
       
-      const result = createFrameworkConfig(config, 'playwright');
+      const result = createFrameworkConfig(config, 'playwright') as PlaywrightConfig;
       
       expect(result.framework).toBe('playwright');
       expect(result.diffThreshold).toBe(0.1);

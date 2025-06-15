@@ -148,6 +148,14 @@ Capture a screenshot for visual comparison.
 
 ## Configuration
 
+TestiVAI supports flexible configuration through multiple methods:
+
+1. **Configuration Files**: Automatically loads from `testivai.config.js`, `testivai.config.ts`, or `testivai.config.json`
+2. **Programmatic Configuration**: Pass options directly to `testivAI.init()`
+3. **Environment-Specific Settings**: Different configurations for development, test, staging, and production
+
+### Configuration Options
+
 ```typescript
 interface testivAIOptions {
   framework: 'playwright' | 'cypress' | 'puppeteer' | 'selenium';
@@ -183,9 +191,56 @@ interface testivAIOptions {
 }
 ```
 
+### Configuration File Example
+
+Create a `testivai.config.js` file in your project root:
+
+```javascript
+module.exports = {
+  framework: 'playwright',
+  baselineDir: '.testivai/baseline',
+  compareDir: '.testivai/compare',
+  reportDir: '.testivai/reports',
+  diffThreshold: 0.1,
+  updateBaselines: false,
+  
+  // Framework-specific configuration
+  playwright: {
+    fullPage: true,
+    type: 'png',
+    quality: 90,
+    animations: 'disabled',
+    caret: 'hide'
+  }
+};
+```
+
+### Environment-Specific Configuration
+
+TestiVAI automatically detects the current environment from `NODE_ENV` or `TESTIVAI_ENV` and applies appropriate settings:
+
+```javascript
+// testivai.config.js
+module.exports = {
+  framework: 'playwright',
+  baselineDir: '.testivai/baseline',
+  
+  // Environment-specific settings
+  development: {
+    diffThreshold: 0.2, // More tolerant in development
+    updateBaselines: true // Auto-update baselines in development
+  },
+  
+  production: {
+    diffThreshold: 0.05, // Stricter in production
+    updateBaselines: false // Never auto-update in production
+  }
+};
+```
+
 ### Selenium Configuration Options
 
-The Selenium integration supports Chrome browser only for the MVP release:
+The Selenium integration supports Chrome browser only for the MVP release with advanced CDP integration:
 
 - **browserName**: Must be 'chrome' (MVP limitation)
 - **headless**: Run Chrome in headless mode (default: true)
@@ -193,6 +248,28 @@ The Selenium integration supports Chrome browser only for the MVP release:
 - **screenshotOptions**: Screenshot capture settings (format, quality, full page)
 - **server**: WebDriver server configuration (local or remote Selenium Grid)
 - **waits**: Timeout settings for various WebDriver operations
+
+### Advanced CDP Integration Features
+
+The Selenium plugin uses Chrome DevTools Protocol (CDP) for enhanced screenshot capture:
+
+#### CDP Session Management
+- **Intelligent session reuse**: Automatically reuses existing CDP sessions for performance
+- **Multiple connection methods**: Supports chrome.debugger, WebSocket, and runtime messaging
+- **Automatic endpoint discovery**: Finds CDP endpoints across common ports (9222, 9223, 9224)
+- **Graceful fallback**: Falls back to traditional Selenium screenshots if CDP fails
+
+#### Enhanced Screenshot Capabilities
+- **Native CDP capture**: Uses `Page.captureScreenshot` for high-quality images
+- **Full page support**: Captures beyond viewport with `captureBeyondViewport`
+- **Element-specific capture**: Precise element bounds calculation and clipping
+- **Performance optimization**: Session persistence reduces connection overhead
+
+#### Error Handling & Reliability
+- **Multi-method retry**: Tries different CDP connection approaches
+- **Robust validation**: Comprehensive input validation and error recovery
+- **Detailed logging**: Clear error messages for debugging CDP issues
+- **Production ready**: Tested across local development and remote Selenium Grid scenarios
 
 ## Plugins
 
