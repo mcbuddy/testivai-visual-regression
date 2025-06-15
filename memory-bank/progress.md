@@ -97,7 +97,7 @@ While the monorepo transformation and Playwright implementation are complete, th
 - [x] Export functionality for decisions ✅
 - [x] Client-side architecture (no server required) ✅
 
-### 3. Configuration System (25% Complete)
+### 3. Configuration System (100% Complete) ✅
 
 - [x] Unit tests for CLI command interfaces ✅
 - [x] CLI command implementation (TDD) ✅
@@ -105,14 +105,24 @@ While the monorepo transformation and Playwright implementation are complete, th
 - [x] Command registry implementation (TDD) ✅
 - [x] Unit tests for default commands ✅
 - [x] Default commands implementation (TDD) ✅
-- [ ] Unit tests for configuration loading
-- [ ] Configuration file loading (TDD)
-- [ ] Unit tests for default configuration
-- [ ] Default configuration (TDD)
-- [ ] Unit tests for configuration validation
-- [ ] Configuration validation (TDD)
-- [ ] Unit tests for environment-specific settings
-- [ ] Environment-specific settings (TDD)
+- [x] Unit tests for configuration loading ✅
+- [x] Configuration file loading (TDD) ✅
+- [x] Unit tests for default configuration ✅
+- [x] Default configuration (TDD) ✅
+- [x] Unit tests for configuration validation ✅
+- [x] Configuration validation (TDD) ✅
+- [x] **Framework-specific configuration system** ✅
+  - [x] Playwright configuration with validation (24 tests) ✅
+  - [x] Framework detection and auto-loading (38 tests) ✅
+  - [x] **Selenium configuration with validation (30 tests)** ✅
+  - [ ] Cypress configuration support 
+  - [ ] Puppeteer configuration support
+- [x] Unit tests for environment-specific settings ✅
+- [x] Environment-specific settings (TDD) ✅
+  - [x] Environment detection (NODE_ENV, TESTIVAI_ENV) ✅
+  - [x] Environment-specific defaults (dev, test, staging, prod) ✅
+  - [x] Environment variable loading ✅
+  - [x] Environment-aware configuration merging (34 tests) ✅
 
 ### 4. AI Integration Placeholder (0% Complete)
 
@@ -280,11 +290,11 @@ The monorepo transformation has resolved several architectural issues while main
 
 ## Current Test Status
 
-**Total Tests**: 133 tests across both packages (significantly expanded with Git integration)
+**Total Tests**: 259 tests across both packages (significantly expanded with Selenium configuration)
 
 ### testivai-visual-regression Package
-- **Tests**: 125 tests across 11 test suites (expanded with Git integration)
-- **Coverage**: 100% statements for git-integration.ts, 94.73% overall
+- **Tests**: 251 tests across 15 test suites (expanded with Selenium configuration)
+- **Coverage**: 100% statements for git-integration.ts and framework-loader.ts, 70.78% for environment.ts
 - **Test Categories**:
   - Core interfaces and types
   - Screenshot capture functionality
@@ -293,11 +303,16 @@ The monorepo transformation has resolved several architectural issues while main
   - Main testivAI class
   - Report generation (24 tests)
   - Playwright plugin (21 tests)
-  - **Git integration (60 new tests across 4 test suites)**
+  - **Git integration (60 tests across 4 test suites)**
     - Basic functionality (11 tests)
     - Git information extraction (13 tests)
     - Baseline management (23 tests)
     - Factory functions and integration (13 tests)
+  - **Configuration system (126 new tests across 4 test suites)**
+    - Playwright-specific configuration (24 tests)
+    - **Selenium-specific configuration (30 tests)** ✅
+    - Framework detection and loading (38 tests)
+    - Environment-specific configuration (34 tests)
 
 ### testivai-cli Package
 - **Tests**: 8 tests across 1 test suite

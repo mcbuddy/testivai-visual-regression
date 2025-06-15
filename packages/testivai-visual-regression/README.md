@@ -34,6 +34,51 @@ test('homepage visual test', async ({ page }) => {
 });
 ```
 
+### Selenium Integration (Chrome Only - For MVP)
+
+```typescript
+import { testivAI } from 'testivai-visual-regression';
+import { seleniumPlugin } from 'testivai-visual-regression/plugins/selenium';
+import { Builder, WebDriver } from 'selenium-webdriver';
+
+// Initialize TestiVAI with Selenium plugin
+const visualTest = testivAI.init({
+  framework: 'selenium',
+  baselineDir: '.testivai/visual-regression/baseline',
+  diffThreshold: 0.1,
+  selenium: {
+    browserName: 'chrome', // Chrome only for MVP
+    headless: true,
+    windowSize: {
+      width: 1280,
+      height: 720
+    },
+    screenshotOptions: {
+      fullPage: true,
+      format: 'png'
+    }
+  }
+});
+
+visualTest.use(seleniumPlugin());
+
+// Example test
+async function runVisualTest() {
+  const driver = await new Builder()
+    .forBrowser('chrome')
+    .build();
+    
+  try {
+    await driver.get('https://example.com');
+    
+    // Capture screenshot for visual comparison
+    await visualTest.capture('homepage', driver);
+  } finally {
+    await driver.quit();
+  }
+}
+```
+
 ### Cypress Integration
 
 ```javascript
@@ -111,8 +156,43 @@ interface testivAIOptions {
   reportDir?: string;
   diffThreshold?: number;
   updateBaselines?: boolean;
+  
+  // Selenium-specific configuration (Chrome only for MVP)
+  selenium?: {
+    browserName?: 'chrome'; // Chrome only for MVP
+    headless?: boolean;
+    windowSize?: {
+      width?: number;
+      height?: number;
+    };
+    screenshotOptions?: {
+      fullPage?: boolean;
+      format?: 'png' | 'jpeg';
+      quality?: number;
+    };
+    server?: {
+      url?: string;
+      local?: boolean;
+    };
+    waits?: {
+      implicit?: number;
+      pageLoad?: number;
+      script?: number;
+    };
+  };
 }
 ```
+
+### Selenium Configuration Options
+
+The Selenium integration supports Chrome browser only for the MVP release:
+
+- **browserName**: Must be 'chrome' (MVP limitation)
+- **headless**: Run Chrome in headless mode (default: true)
+- **windowSize**: Browser window dimensions for consistent screenshots
+- **screenshotOptions**: Screenshot capture settings (format, quality, full page)
+- **server**: WebDriver server configuration (local or remote Selenium Grid)
+- **waits**: Timeout settings for various WebDriver operations
 
 ## Plugins
 
