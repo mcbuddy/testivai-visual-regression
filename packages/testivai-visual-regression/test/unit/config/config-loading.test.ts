@@ -132,10 +132,9 @@ describe('Configuration Loading', () => {
       (global as any).require = originalRequire;
     });
 
-    it('should load JavaScript configuration file with default export', async () => {
-      // Skip this test for now - it's not critical and is causing issues
-      // The functionality is already tested in the "load JavaScript configuration file with require" test
-      expect(true).toBe(true);
+    it.skip('should load JavaScript configuration file with default export', async () => {
+      // This test is skipped because dynamic import is difficult to mock properly
+      // The functionality is partially covered by the "should load JavaScript configuration file with require" test
     });
 
     it('should load TypeScript configuration file', async () => {
@@ -186,9 +185,34 @@ describe('Configuration Loading', () => {
     });
 
     it('should handle require errors gracefully', async () => {
-      // Skip this test for now - it's not critical and is causing issues
-      // The functionality is already tested in other tests
-      expect(true).toBe(true);
+      mockFs.existsSync.mockReturnValue(true);
+      mockPath.extname.mockReturnValue('.js');
+      mockPath.resolve.mockReturnValue('/resolved/config.js');
+      
+      // Mock require to throw an error
+      const originalRequire = require;
+      const mockRequire = jest.fn().mockImplementation(() => {
+        throw new Error('Module not found');
+      });
+      
+      // Mock require.resolve to throw an error
+      const mockResolve = jest.fn().mockImplementation(() => {
+        throw new Error('Cannot find module');
+      });
+      
+      // Replace global require with our mock
+      (global as any).require = mockRequire;
+      (global as any).require.resolve = mockResolve;
+      (global as any).require.cache = {};
+      
+      try {
+        await expect(loadConfigFromFile('config.js')).rejects.toThrow(
+          'Failed to load configuration from config.js: Cannot find module'
+        );
+      } finally {
+        // Restore require (in finally block to ensure it's restored even if test fails)
+        (global as any).require = originalRequire;
+      }
     });
   });
 
@@ -377,9 +401,34 @@ describe('Configuration Loading', () => {
 
   describe('Path resolution', () => {
     it('should resolve absolute paths through path.resolve', async () => {
-      // Skip this test for now - it's not critical and is causing issues
-      // The functionality is already tested in other tests
-      expect(true).toBe(true);
+      const mockConfig = {
+        baselineDir: '/absolute/path/baseline',
+        compareDir: '/absolute/path/compare',
+        reportDir: '/absolute/path/reports'
+      };
+      
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue(JSON.stringify(mockConfig));
+      mockPath.extname.mockReturnValue('.json');
+      
+      // Clear previous calls to mockPath.resolve
+      mockPath.resolve.mockClear();
+      
+      // Create a specific implementation that tracks calls
+      const resolveImplementation = jest.fn().mockImplementation((p) => `/resolved/${p}`);
+      mockPath.resolve.mockImplementation(resolveImplementation);
+      
+      const result = await loadConfig('config.json');
+      
+      // Verify that resolveImplementation was called for each path
+      expect(resolveImplementation).toHaveBeenCalledWith('/absolute/path/baseline');
+      expect(resolveImplementation).toHaveBeenCalledWith('/absolute/path/compare');
+      expect(resolveImplementation).toHaveBeenCalledWith('/absolute/path/reports');
+      
+      // Verify the resolved paths in the result
+      expect(result.baselineDir).toBe('/resolved//absolute/path/baseline');
+      expect(result.compareDir).toBe('/resolved//absolute/path/compare');
+      expect(result.reportDir).toBe('/resolved//absolute/path/reports');
     });
 
     it('should handle undefined path properties', async () => {
@@ -404,15 +453,58 @@ describe('Configuration Loading', () => {
 
   describe('Integration tests', () => {
     it('should work with complete configuration workflow', async () => {
-      // Skip this test for now - it's not critical and is causing issues
-      // The functionality is already tested in other tests
-      expect(true).toBe(true);
+      // Setup mocks for a complete workflow
+      const mockConfig = {
+        framework: 'cypress' as const,
+        diffThreshold: 0.2,
+        baselineDir: './custom/baseline',
+        compareDir: './custom/compare'
+      };
+      
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue(JSON.stringify(mockConfig));
+      mockPath.extname.mockReturnValue('.json');
+      mockPath.resolve.mockImplementation((p) => `/resolved/${p}`);
+      
+      // Test the complete workflow
+      const result = await loadConfig('testivai.config.json');
+      
+      // Verify the result combines defaults with loaded config
+      expect(result).toEqual({
+        framework: 'cypress',
+        diffThreshold: 0.2,
+        baselineDir: '/resolved/./custom/baseline',
+        compareDir: '/resolved/./custom/compare',
+        reportDir: '.testivai/reports',
+        updateBaselines: false
+      });
     });
 
     it('should handle mixed configuration sources', async () => {
-      // Skip this test for now - it's not critical and is causing issues
-      // The functionality is already tested in other tests
-      expect(true).toBe(true);
+      // This test verifies that the configuration system can handle
+      // a mix of default values, loaded values, and resolved paths
+      
+      const mockConfig = {
+        // Only specify some options
+        framework: 'puppeteer' as const,
+        baselineDir: './puppeteer/baseline'
+        // Let other options use defaults
+      };
+      
+      mockFs.existsSync.mockReturnValue(true);
+      mockFs.readFileSync.mockReturnValue(JSON.stringify(mockConfig));
+      mockPath.extname.mockReturnValue('.json');
+      mockPath.resolve.mockImplementation((p) => `/resolved/${p}`);
+      
+      const result = await loadConfig('config.json');
+      
+      // Verify mixed sources
+      expect(result.framework).toBe('puppeteer'); // From config
+      expect(result.baselineDir).toBe('/resolved/./puppeteer/baseline'); // From config, resolved
+      expect(result.compareDir).toBe('.testivai/compare'); // Default, not resolved
+      expect(result.reportDir).toBe('.testivai/reports'); // Default, not resolved
+      expect(result.diffThreshold).toBe(0.1); // Default
+      expect(result.updateBaselines).toBe(false); // Default
     });
   });
 });

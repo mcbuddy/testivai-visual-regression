@@ -5,11 +5,13 @@
 import { testivAIOptions, FrameworkType } from '../core/interfaces';
 import { PlaywrightConfig, getPlaywrightDefaultConfig, validatePlaywrightConfig, mergePlaywrightConfig } from './playwright';
 import { SeleniumConfig, getSeleniumDefaultConfig, validateSeleniumConfig, mergeSeleniumConfig } from './selenium';
+import { PuppeteerConfig, getPuppeteerDefaultConfig, validatePuppeteerConfig, mergePuppeteerConfig } from './puppeteer';
+import { CypressConfig, getCypressDefaultConfig, validateCypressConfig, mergeCypressConfig } from './cypress';
 
 /**
  * Union type for all framework-specific configurations
  */
-export type FrameworkConfig = PlaywrightConfig | SeleniumConfig;
+export type FrameworkConfig = PlaywrightConfig | SeleniumConfig | PuppeteerConfig | CypressConfig;
 
 /**
  * Framework configuration factory interface
@@ -30,44 +32,14 @@ const frameworkFactories: Record<FrameworkType, FrameworkConfigFactory> = {
     mergeConfig: mergePlaywrightConfig
   },
   cypress: {
-    getDefaultConfig: () => ({
-      framework: 'cypress',
-      baselineDir: '.testivai/baseline',
-      compareDir: '.testivai/compare',
-      reportDir: '.testivai/reports',
-      diffThreshold: 0.1,
-      updateBaselines: false
-    }),
-    validateConfig: (config) => ({ isValid: true, errors: [] }),
-    mergeConfig: (config) => ({
-      framework: 'cypress',
-      baselineDir: '.testivai/baseline',
-      compareDir: '.testivai/compare',
-      reportDir: '.testivai/reports',
-      diffThreshold: 0.1,
-      updateBaselines: false,
-      ...config
-    })
+    getDefaultConfig: getCypressDefaultConfig,
+    validateConfig: validateCypressConfig,
+    mergeConfig: mergeCypressConfig
   },
   puppeteer: {
-    getDefaultConfig: () => ({
-      framework: 'puppeteer',
-      baselineDir: '.testivai/baseline',
-      compareDir: '.testivai/compare',
-      reportDir: '.testivai/reports',
-      diffThreshold: 0.1,
-      updateBaselines: false
-    }),
-    validateConfig: (config) => ({ isValid: true, errors: [] }),
-    mergeConfig: (config) => ({
-      framework: 'puppeteer',
-      baselineDir: '.testivai/baseline',
-      compareDir: '.testivai/compare',
-      reportDir: '.testivai/reports',
-      diffThreshold: 0.1,
-      updateBaselines: false,
-      ...config
-    })
+    getDefaultConfig: getPuppeteerDefaultConfig,
+    validateConfig: validatePuppeteerConfig,
+    mergeConfig: mergePuppeteerConfig
   },
   selenium: {
     getDefaultConfig: getSeleniumDefaultConfig,
