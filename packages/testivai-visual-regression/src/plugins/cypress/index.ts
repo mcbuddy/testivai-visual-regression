@@ -1,5 +1,5 @@
 /**
- * Cypress plugin for TestivAI Visual Regression
+ * Cypress plugin for testivAI Visual Regression
  */
 
 import * as fs from 'fs';
@@ -60,7 +60,7 @@ interface CypressPluginOptions {
 }
 
 /**
- * Create a Cypress plugin for TestivAI Visual Regression
+ * Create a Cypress plugin for testivAI Visual Regression
  * @param options Plugin options
  * @returns Cypress plugin
  */
@@ -198,7 +198,7 @@ export const cypressPlugin = (options?: CypressPluginOptions): Plugin => {
     await waitForSelectors(cy);
   };
   
-  // Convert TestivAI options to Cypress options
+  // Convert testivAI options to Cypress options
   const convertOptions = (options?: ScreenshotOptions): CypressScreenshotOptions => {
     // Start with default options from config
     const baseOptions = config?.cypress?.screenshotOptions || {};

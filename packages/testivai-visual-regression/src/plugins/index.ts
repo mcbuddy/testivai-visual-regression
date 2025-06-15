@@ -1,5 +1,5 @@
 /**
- * Framework plugins for TestiVAI Visual Regression
+ * Framework plugins for testivAI Visual Regression
  */
 
 // Export framework-specific plugins

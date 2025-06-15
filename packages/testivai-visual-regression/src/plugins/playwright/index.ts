@@ -1,5 +1,5 @@
 /**
- * Playwright plugin for TestivaiVR Visual Regression
+ * Playwright plugin for testivAI Visual Regression
  */
 
 import { Plugin, ScreenshotOptions } from '../../core/interfaces';
@@ -92,7 +92,7 @@ export const playwrightPlugin = (pluginOptions: PlaywrightPluginOptions = {}): P
       // Get current branch if not provided
       const branch = pluginOptions.branch || await getCurrentBranch();
       
-      // Convert TestiVAI screenshot options to Playwright options
+      // Convert testivAI screenshot options to Playwright options
       const playwrightOptions = convertToPlaywrightOptions(options);
       
       // Create target object that matches the expected interface
@@ -169,7 +169,7 @@ function generateFilenameFromUrl(url: string): string {
 }
 
 /**
- * Convert TestiVAI screenshot options to Playwright-specific options
+ * Convert testivAI screenshot options to Playwright-specific options
  */
 function convertToPlaywrightOptions(options?: ScreenshotOptions): PlaywrightScreenshotOptions {
   const playwrightOptions: PlaywrightScreenshotOptions = {

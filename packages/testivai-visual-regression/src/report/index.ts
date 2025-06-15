@@ -146,7 +146,7 @@ export class ReportGenerator {
         changedTests,
         passedTests,
         framework,
-        testivaiVersion: this.getTestiVAIVersion()
+        testivaiVersion: this.getTestivAIVersion()
       },
       tests
     };
@@ -296,9 +296,9 @@ export class ReportGenerator {
   }
 
   /**
-   * Get TestiVAI version from package.json
+   * Get testivAI version from package.json
    */
-  private getTestiVAIVersion(): string {
+  private getTestivAIVersion(): string {
     try {
       const packagePath = path.join(__dirname, '../../package.json');
       const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));

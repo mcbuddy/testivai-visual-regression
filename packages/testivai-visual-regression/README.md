@@ -1,4 +1,4 @@
-# TestiVAI Visual Regression SDK
+# testivAI Visual Regression SDK
 
 A TypeScript SDK for visual regression testing that integrates with multiple testing frameworks.
 
@@ -17,7 +17,7 @@ import { test } from '@playwright/test';
 import { testivAI } from 'testivai-visual-regression';
 import { playwrightPlugin } from 'testivai-visual-regression/plugins/playwright';
 
-// Initialize TestiVAI with Playwright plugin
+// Initialize testivAI with Playwright plugin
 const visualTest = testivAI.init({
   framework: 'playwright',
   baselineDir: '.testivai/visual-regression/baseline',
@@ -41,7 +41,7 @@ import { testivAI } from 'testivai-visual-regression';
 import { seleniumPlugin } from 'testivai-visual-regression/plugins/selenium';
 import { Builder, WebDriver } from 'selenium-webdriver';
 
-// Initialize TestiVAI with Selenium plugin
+// Initialize testivAI with Selenium plugin
 const visualTest = testivAI.init({
   framework: 'selenium',
   baselineDir: '.testivai/visual-regression/baseline',
@@ -148,7 +148,7 @@ Capture a screenshot for visual comparison.
 
 ## Configuration
 
-TestiVAI supports flexible configuration through multiple methods:
+testivAI supports flexible configuration through multiple methods:
 
 1. **Configuration Files**: Automatically loads from `testivai.config.js`, `testivai.config.ts`, or `testivai.config.json`
 2. **Programmatic Configuration**: Pass options directly to `testivAI.init()`
@@ -217,7 +217,7 @@ module.exports = {
 
 ### Environment-Specific Configuration
 
-TestiVAI automatically detects the current environment from `NODE_ENV` or `TESTIVAI_ENV` and applies appropriate settings:
+testivAI automatically detects the current environment from `NODE_ENV` or `testivAI_ENV` and applies appropriate settings:
 
 ```javascript
 // testivai.config.js

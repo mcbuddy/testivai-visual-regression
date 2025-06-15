@@ -1,5 +1,5 @@
 /**
- * Git integration module for TestiVAI Visual Regression
+ * Git integration module for testivAI Visual Regression
  */
 
 import simpleGit, { SimpleGit } from 'simple-git';

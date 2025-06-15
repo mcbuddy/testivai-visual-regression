@@ -1,5 +1,5 @@
 /**
- * Selenium plugin for TestivaiVR Visual Regression
+ * Selenium plugin for testivAI Visual Regression
  * Uses Chrome DevTools Protocol (CDP) for screenshot capture
  */
 
@@ -114,7 +114,7 @@ async function captureScreenshotWithCDP(
   options?: ScreenshotOptions
 ): Promise<Buffer> {
   try {
-    // Convert TestiVAI options to CDP options
+    // Convert testivAI options to CDP options
     const cdpOptions = convertToCDPOptions(options);
     
     // Handle full page screenshots
@@ -460,7 +460,7 @@ function generateFilenameFromUrl(url: string): string {
 }
 
 /**
- * Convert TestiVAI screenshot options to CDP-specific options
+ * Convert testivAI screenshot options to CDP-specific options
  */
 function convertToCDPOptions(options?: ScreenshotOptions): CDPScreenshotOptions {
   const cdpOptions: CDPScreenshotOptions = {

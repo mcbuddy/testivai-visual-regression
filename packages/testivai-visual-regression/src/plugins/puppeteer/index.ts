@@ -1,5 +1,5 @@
 /**
- * Puppeteer plugin for TestivAI Visual Regression
+ * Puppeteer plugin for testivAI Visual Regression
  */
 
 import * as fs from 'fs';
@@ -58,7 +58,7 @@ interface PuppeteerPluginOptions {
 }
 
 /**
- * Create a Puppeteer plugin for TestivAI Visual Regression
+ * Create a Puppeteer plugin for testivAI Visual Regression
  * @param options Plugin options
  * @returns Puppeteer plugin
  */

@@ -1,5 +1,5 @@
 /**
- * AI integration placeholder for TestivaiVR Visual Regression
+ * AI integration placeholder for testivAI Visual Regression
  */
 
 // This is a placeholder file
