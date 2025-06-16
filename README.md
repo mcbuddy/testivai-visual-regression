@@ -1,4 +1,4 @@
-# TestiVAI Visual Regression
+# testivAI Visual Regression
 
 A comprehensive TypeScript SDK and CLI for visual regression testing that integrates with multiple testing frameworks.
 
@@ -23,7 +23,7 @@ npm install testivai-visual-regression
 
 ### 🔧 [testivai-cli](./packages/testivai-cli)
 
-Command-line interface for TestiVAI Visual Regression.
+Command-line interface for testivAI Visual Regression.
 
 ```bash
 npm install -g testivai-cli

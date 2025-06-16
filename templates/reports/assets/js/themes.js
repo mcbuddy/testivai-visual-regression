@@ -1,4 +1,4 @@
-// TestiVAI Visual Regression Report - Theme Management
+// testivAI Visual Regression Report - Theme Management
 // Handles theme switching and persistence
 
 class ThemeManager {
@@ -201,8 +201,8 @@ class ThemeManager {
 const themeManager = new ThemeManager();
 
 // Export for use in other scripts
-window.TestiVAI = window.TestiVAI || {};
-window.TestiVAI.themeManager = themeManager;
+window.testivAI = window.testivAI || {};
+window.testivAI.themeManager = themeManager;
 
 // CSS for theme toast (injected dynamically)
 const themeToastStyles = `

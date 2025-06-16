@@ -1,7 +1,7 @@
 {
   "name": "testivai-cli",
   "version": "1.0.0",
-  "description": "CLI tool for TestiVAI Visual Regression testing",
+  "description": "CLI tool for testivAI Visual Regression testing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {

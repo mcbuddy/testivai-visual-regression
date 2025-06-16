@@ -1,7 +1,7 @@
-# Project Brief: TestiVAI Visual Regression
+# Project Brief: testivAI Visual Regression
 
 ## Project Overview
-TestiVAI Visual Regression is a TypeScript SDK designed to simplify and enhance visual regression testing across multiple testing frameworks. It provides a unified approach to capturing, comparing, and managing screenshots for visual regression testing.
+testivAI Visual Regression is a TypeScript SDK designed to simplify and enhance visual regression testing across multiple testing frameworks. It provides a unified approach to capturing, comparing, and managing screenshots for visual regression testing.
 
 ## Core Requirements
 

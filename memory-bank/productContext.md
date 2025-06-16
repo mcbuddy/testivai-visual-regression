@@ -1,4 +1,4 @@
-# Product Context: TestiVAI Visual Regression
+# Product Context: testivAI Visual Regression
 
 ## Problem Statement
 
@@ -16,7 +16,7 @@ Visual regression testing is critical for modern web applications, but it comes 
 
 ## Solution Overview
 
-TestiVAI Visual Regression addresses these challenges by providing:
+testivAI Visual Regression addresses these challenges by providing:
 
 1. **Unified API**: A consistent interface across multiple testing frameworks, reducing the learning curve and enabling framework-agnostic visual testing.
 
@@ -59,7 +59,7 @@ TestiVAI Visual Regression addresses these challenges by providing:
 
 ## Value Proposition
 
-TestiVAI Visual Regression delivers:
+testivAI Visual Regression delivers:
 
 1. **Efficiency**: Reduce time spent on manual visual testing and review
 2. **Consistency**: Ensure visual consistency across different parts of the application

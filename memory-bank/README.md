@@ -1,6 +1,6 @@
-# TestiVAI Visual Regression Memory Bank
+# testivAI Visual Regression Memory Bank
 
-This directory contains the memory bank for the TestiVAI Visual Regression project. It serves as the central knowledge repository for the project, documenting requirements, architecture, technical decisions, and progress.
+This directory contains the memory bank for the testivAI Visual Regression project. It serves as the central knowledge repository for the project, documenting requirements, architecture, technical decisions, and progress.
 
 ## Memory Bank Structure
 

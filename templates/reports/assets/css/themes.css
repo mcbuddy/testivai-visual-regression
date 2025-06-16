@@ -1,11 +1,11 @@
-/* TestiVAI Visual Regression Report - Theme System */
+/* testivAI Visual Regression Report - Theme System */
 /* Inspired by Allure Report's clean, professional design */
 
 :root {
-  /* Brand Colors */
-  --testivai-primary: #2563eb;      /* Blue - primary brand */
-  --testivai-primary-hover: #1d4ed8;
-  --testivai-primary-light: #dbeafe;
+  /* Brand Colors - Updated to match logo */
+  --testivai-primary: #4a86e8;      /* Blue - primary brand (from logo) */
+  --testivai-primary-hover: #3a76d8;
+  --testivai-primary-light: #d4e4fc;
   --testivai-secondary: #64748b;    /* Slate - secondary */
   --testivai-accent: #0ea5e9;       /* Sky blue - accents */
   
@@ -130,8 +130,8 @@
   --color-text-inverse: var(--color-gray-900);
   
   /* Adjust brand colors for dark theme */
-  --testivai-primary: #3b82f6;
-  --testivai-primary-hover: #2563eb;
+  --testivai-primary: #5a96f8;
+  --testivai-primary-hover: #4a86e8;
   --testivai-primary-light: #1e3a8a;
   
   /* Adjust status colors for dark theme */

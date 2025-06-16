@@ -1,4 +1,4 @@
-/* TestiVAI Visual Regression Report - Main Styles */
+/* testivAI Visual Regression Report - Main Styles */
 /* Inspired by Allure Report's clean, professional design */
 
 /* Reset and Base Styles */
@@ -69,7 +69,7 @@ body {
 .logo-icon {
   width: var(--space-8);
   height: var(--space-8);
-  color: var(--testivai-primary);
+  object-fit: contain;
 }
 
 .logo-text {

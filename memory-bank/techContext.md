@@ -1,4 +1,4 @@
-# Technical Context: TestiVAI Visual Regression
+# Technical Context: testivAI Visual Regression
 
 ## Technologies Used
 
@@ -271,7 +271,7 @@ npm run test --workspace=packages/testivai-cli
 {
   "name": "testivai-cli",
   "version": "1.0.0",
-  "description": "CLI tool for TestiVAI Visual Regression testing",
+  "description": "CLI tool for testivAI Visual Regression testing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -290,7 +290,7 @@ npm run test --workspace=packages/testivai-cli
 
 ### SDK Integration with Testing Frameworks
 
-The TestiVAI Visual Regression SDK is designed to integrate seamlessly with existing testing framework commands rather than requiring a separate CLI. This allows users to run visual regression tests alongside their existing test suites.
+The testivAI Visual Regression SDK is designed to integrate seamlessly with existing testing framework commands rather than requiring a separate CLI. This allows users to run visual regression tests alongside their existing test suites.
 
 #### Playwright Integration
 
@@ -300,7 +300,7 @@ import { test } from '@playwright/test';
 import { testivAI } from 'testivai-visual-regression';
 import { playwrightPlugin } from 'testivai-visual-regression/plugins/playwright';
 
-// Initialize TestiVAI with Playwright plugin
+// Initialize testivAI with Playwright plugin
 const visualTest = testivAI.init({
   framework: 'playwright',
   baselineDir: '.testivai/visual-regression/baseline',
@@ -309,7 +309,7 @@ const visualTest = testivAI.init({
 
 visualTest.use(playwrightPlugin());
 
-// Use standard Playwright test commands with TestiVAI visual assertions
+// Use standard Playwright test commands with testivAI visual assertions
 test('homepage visual test', async ({ page }) => {
   await page.goto('https://example.com');
   

@@ -1,6 +1,6 @@
-# TestiVAI CLI
+# testivAI CLI
 
-Command-line interface for TestiVAI Visual Regression testing.
+Command-line interface for testivAI Visual Regression testing.
 
 ## Installation
 
@@ -38,9 +38,9 @@ Initialize testivAI Visual Regression in the current project.
 
 **Options:**
 - `--framework, -f` - Testing framework to use (playwright, cypress, puppeteer, selenium) [default: playwright]
-- `--baseline-dir, -b` - Directory to store baseline screenshots [default: .testivAI/visual-regression/baseline]
-- `--compare-dir, -c` - Directory to store comparison screenshots [default: .testivAI/visual-regression/compare]
-- `--report-dir, -r` - Directory to store generated reports [default: .testivAI/visual-regression/reports]
+- `--baseline-dir, -b` - Directory to store baseline screenshots [default: .testivai/visual-regression/baseline]
+- `--compare-dir, -c` - Directory to store comparison screenshots [default: .testivai/visual-regression/compare]
+- `--report-dir, -r` - Directory to store generated reports [default: .testivai/visual-regression/reports]
 - `--diff-threshold, -t` - Threshold for acceptable difference between screenshots (0-1) [default: 0.1]
 
 **Example:**
@@ -53,9 +53,9 @@ testivai init --framework playwright --baseline-dir ./screenshots/baseline --dif
 Compare screenshots against baselines.
 
 **Options:**
-- `--baseline-dir, -b` - Directory containing baseline screenshots [default: .testivAI/visual-regression/baseline]
-- `--compare-dir, -c` - Directory containing comparison screenshots [default: .testivAI/visual-regression/compare]
-- `--report-dir, -r` - Directory to store generated reports [default: .testivAI/visual-regression/reports]
+- `--baseline-dir, -b` - Directory containing baseline screenshots [default: .testivai/visual-regression/baseline]
+- `--compare-dir, -c` - Directory containing comparison screenshots [default: .testivai/visual-regression/compare]
+- `--report-dir, -r` - Directory to store generated reports [default: .testivai/visual-regression/reports]
 - `--diff-threshold, -t` - Threshold for acceptable difference between screenshots (0-1) [default: 0.1]
 - `--update-baselines, -u` - Update baselines with comparison screenshots if different [default: false]
 
@@ -87,9 +87,9 @@ The CLI can generate a configuration file (`testivai.config.js`) to store your s
 ```javascript
 module.exports = {
   framework: 'playwright',
-  baselineDir: '.testivAI/visual-regression/baseline',
-  compareDir: '.testivAI/visual-regression/compare',
-  reportDir: '.testivAI/visual-regression/reports',
+  baselineDir: '.testivai/visual-regression/baseline',
+  compareDir: '.testivai/visual-regression/compare',
+  reportDir: '.testivai/visual-regression/reports',
   diffThreshold: 0.1,
   updateBaselines: false
 };
@@ -97,7 +97,7 @@ module.exports = {
 
 ## Integration with Testing Frameworks
 
-The CLI is designed to work alongside the TestiVAI Visual Regression SDK. For programmatic usage in your tests, install the SDK:
+The CLI is designed to work alongside the testivAI Visual Regression SDK. For programmatic usage in your tests, install the SDK:
 
 ```bash
 npm install testivai-visual-regression

@@ -1,8 +1,8 @@
-# System Patterns: TestiVAI Visual Regression
+# System Patterns: testivAI Visual Regression
 
 ## System Architecture
 
-The TestiVAI Visual Regression system has been transformed into a monorepo architecture with two separate packages that work together to provide comprehensive visual regression testing capabilities:
+The testivAI Visual Regression system has been transformed into a monorepo architecture with two separate packages that work together to provide comprehensive visual regression testing capabilities:
 
 ```mermaid
 graph TD
@@ -245,7 +245,7 @@ The system is designed with several extension points:
 
 ## Testing Strategy
 
-The TestiVAI Visual Regression system follows a comprehensive testing strategy adapted for the monorepo structure:
+The testivAI Visual Regression system follows a comprehensive testing strategy adapted for the monorepo structure:
 
 ```mermaid
 graph TD

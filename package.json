@@ -1,7 +1,7 @@
 {
   "name": "testivai",
   "version": "1.0.0",
-  "description": "TestiVAI Visual Regression Testing - Monorepo",
+  "description": "testivAI Visual Regression Testing - Monorepo",
   "private": true,
   "workspaces": [
     "packages/*"
