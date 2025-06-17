@@ -79,6 +79,26 @@
   color: var(--status-pending-dark);
 }
 
+.status-badge.approved {
+  background-color: var(--status-passed-light);
+  color: var(--status-passed-dark);
+}
+
+.status-badge.rejected {
+  background-color: var(--status-failed-light);
+  color: var(--status-failed-dark);
+}
+
+.status-badge.new {
+  background-color: var(--testivai-primary-light);
+  color: var(--testivai-primary);
+}
+
+.status-badge.deleted {
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-700);
+}
+
 .status-icon {
   width: var(--space-3);
   height: var(--space-3);
@@ -118,6 +138,45 @@
   border-bottom-color: var(--testivai-primary);
 }
 
+/* Side-by-side image comparison */
+.image-comparison.side-by-side {
+  margin-bottom: var(--space-4);
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.image-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.image-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.image-wrapper {
+  position: relative;
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  cursor: pointer;
+}
+
+.image-wrapper:hover {
+  border-color: var(--testivai-primary);
+}
+
+/* Original image container styles */
 .image-container {
   position: relative;
   background-color: var(--color-gray-50);
@@ -281,7 +340,7 @@
   letter-spacing: 0.025em;
 }
 
-.test-status.accepted {
+.test-status.accepted, .test-status.approved {
   background-color: var(--status-passed);
   color: var(--color-text-inverse);
 }
@@ -294,6 +353,57 @@
 .test-status.pending {
   background-color: var(--status-pending);
   color: var(--color-text-inverse);
+}
+
+.test-status.new {
+  background-color: var(--testivai-primary);
+  color: var(--color-text-inverse);
+}
+
+.test-status.deleted {
+  background-color: var(--color-gray-600);
+  color: var(--color-text-inverse);
+}
+
+/* PR Info and Meta Info */
+.pr-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-right: var(--space-4);
+}
+
+.pr-number a, .pr-commit a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: color var(--transition-fast);
+}
+
+.pr-number a:hover, .pr-commit a:hover {
+  color: var(--testivai-primary);
+}
+
+.meta-info {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.meta-item {
+  display: flex;
+  margin-bottom: var(--space-2);
+}
+
+.meta-label {
+  width: 120px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.meta-value {
+  color: var(--color-text-primary);
 }
 
 /* Modal Styles */
@@ -659,6 +769,62 @@
   font-size: var(--font-size-xs);
 }
 
+/* Unchanged Tests Section */
+.unchanged-tests-section {
+  grid-column: 1 / -1;
+  margin-top: var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.unchanged-tests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  background-color: var(--color-gray-50);
+  cursor: pointer;
+}
+
+.unchanged-tests-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-8);
+  height: var(--space-8);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle-btn:hover {
+  color: var(--color-text-primary);
+}
+
+.toggle-icon {
+  width: var(--space-5);
+  height: var(--space-5);
+  transition: transform var(--transition-fast);
+}
+
+.unchanged-tests-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+}
+
 /* Dark theme adjustments */
 [data-theme="dark"] .image-container {
   background-color: var(--color-gray-800);
@@ -678,4 +844,8 @@
 
 [data-theme="dark"] .shortcut-key {
   background-color: var(--color-gray-700);
+}
+
+[data-theme="dark"] .unchanged-tests-header {
+  background-color: var(--color-gray-800);
 }

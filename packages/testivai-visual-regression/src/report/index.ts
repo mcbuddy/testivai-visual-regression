@@ -11,6 +11,12 @@ export interface ReportMetadata {
   passedTests: number;
   framework: string;
   testivaiVersion: string;
+  prInfo?: {
+    number: string;
+    url: string;
+    commitSha: string;
+    commitUrl: string;
+  };
 }
 
 export interface GitInfo {
@@ -28,7 +34,8 @@ export interface TestResult {
   baseline: string;
   current: string;
   diff: string | null;
-  status: 'passed' | 'changed' | 'failed';
+  status: 'passed' | 'changed' | 'failed' | 'new' | 'deleted';
+  approvalStatus?: 'approved' | 'rejected';
   diffPercentage: number;
   diffPixels: number;
   dimensions: {
@@ -52,6 +59,13 @@ export interface TestResult {
 export interface ReportData {
   metadata: ReportMetadata;
   tests: TestResult[];
+  groupedTests?: {
+    approved: TestResult[];
+    rejected: TestResult[];
+    new: TestResult[];
+    deleted: TestResult[];
+    pending: TestResult[];
+  };
 }
 
 export interface HistoryCommit {
@@ -72,6 +86,21 @@ export interface HistoryCommit {
     accepted: number;
     rejected: number;
     pending: number;
+  };
+}
+
+export interface ApprovalsData {
+  approved: string[];
+  rejected: string[];
+  new: string[];
+  deleted: string[];
+  meta: {
+    author: string;
+    timestamp: string;
+    source?: string;
+    pr_url?: string;
+    commit_sha?: string;
+    commit_url?: string;
   };
 }
 
@@ -98,6 +127,13 @@ export class ReportGenerator {
       framework?: string;
       outputPath?: string;
       includeHistory?: boolean;
+      approvalsData?: ApprovalsData;
+      prInfo?: {
+        number: string;
+        url: string;
+        commitSha: string;
+        commitUrl: string;
+      };
     } = {}
   ): Promise<string> {
     const outputDir = options.outputPath || this.outputPath;
@@ -108,7 +144,7 @@ export class ReportGenerator {
     }
 
     // Generate report data
-    const reportData = await this.generateReportData(comparisonResults, options.framework);
+    const reportData = await this.generateReportData(comparisonResults, options.framework, options.approvalsData, options.prInfo);
     
     // Generate history data if requested
     let historyData: HistoryData | null = null;
@@ -120,7 +156,7 @@ export class ReportGenerator {
     await this.copyTemplateFiles(outputDir);
 
     // Write report data
-    await this.writeReportData(outputDir, reportData, historyData);
+    await this.writeReportData(outputDir, reportData, historyData, options.approvalsData);
 
     return path.resolve(outputDir, 'index.html');
   }
@@ -130,13 +166,23 @@ export class ReportGenerator {
    */
   private async generateReportData(
     comparisonResults: ComparisonResult[],
-    framework: string = 'unknown'
+    framework: string = 'unknown',
+    approvalsData?: ApprovalsData,
+    prInfo?: {
+      number: string;
+      url: string;
+      commitSha: string;
+      commitUrl: string;
+    }
   ): Promise<ReportData> {
     const gitInfo = await this.getGitInfo();
-    const tests = this.convertComparisonResultsToTestResults(comparisonResults, framework);
+    const tests = this.convertComparisonResultsToTestResults(comparisonResults, framework, approvalsData);
     
     const changedTests = tests.filter(t => t.status === 'changed' || t.status === 'failed').length;
     const passedTests = tests.filter(t => t.status === 'passed').length;
+
+    // Group tests by status
+    const groupedTests = this.groupTestsByStatus(tests, approvalsData);
 
     return {
       metadata: {
@@ -146,9 +192,44 @@ export class ReportGenerator {
         changedTests,
         passedTests,
         framework,
-        testivaiVersion: this.getTestivAIVersion()
+        testivaiVersion: this.getTestivAIVersion(),
+        prInfo
       },
-      tests
+      tests,
+      groupedTests
+    };
+  }
+
+  /**
+   * Group tests by their status (approved, rejected, new, deleted, pending)
+   */
+  private groupTestsByStatus(tests: TestResult[], approvalsData?: ApprovalsData): ReportData['groupedTests'] {
+    const approved: TestResult[] = [];
+    const rejected: TestResult[] = [];
+    const newTests: TestResult[] = [];
+    const deleted: TestResult[] = [];
+    const pending: TestResult[] = [];
+
+    tests.forEach(test => {
+      if (test.approvalStatus === 'approved') {
+        approved.push(test);
+      } else if (test.approvalStatus === 'rejected') {
+        rejected.push(test);
+      } else if (test.status === 'new') {
+        newTests.push(test);
+      } else if (test.status === 'deleted') {
+        deleted.push(test);
+      } else {
+        pending.push(test);
+      }
+    });
+
+    return {
+      approved,
+      rejected,
+      new: newTests,
+      deleted,
+      pending
     };
   }
 
@@ -157,26 +238,81 @@ export class ReportGenerator {
    */
   private convertComparisonResultsToTestResults(
     comparisonResults: ComparisonResult[],
-    framework: string
+    framework: string,
+    approvalsData?: ApprovalsData
   ): TestResult[] {
-    return comparisonResults.map(result => ({
-      name: result.name,
-      baseline: result.baselinePath,
-      current: result.comparePath,
-      diff: result.diffPath || null,
-      status: result.passed ? 'passed' : 'changed',
-      diffPercentage: result.diffPercentage || 0,
-      diffPixels: Math.round((result.diffPercentage || 0) * 1280 * 800), // Estimate pixels from percentage
-      dimensions: {
-        width: 1280, // Default dimensions - could be enhanced to read from image metadata
-        height: 800
-      },
-      testInfo: {
-        framework,
-        viewport: '1280x800',
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    const results = comparisonResults.map(result => {
+      // Determine status based on comparison result
+      let status: TestResult['status'] = result.passed ? 'passed' : 'changed';
+      
+      // Apply approval status if available
+      let approvalStatus: TestResult['approvalStatus'] = undefined;
+      
+      if (approvalsData) {
+        const testName = result.name;
+        
+        if (approvalsData.approved.includes(testName)) {
+          approvalStatus = 'approved';
+        } else if (approvalsData.rejected.includes(testName)) {
+          approvalStatus = 'rejected';
+        } else if (approvalsData.new.includes(testName)) {
+          status = 'new';
+        } else if (approvalsData.deleted.includes(testName)) {
+          status = 'deleted';
+        }
       }
-    }));
+      
+      return {
+        name: result.name,
+        baseline: result.baselinePath,
+        current: result.comparePath,
+        diff: result.diffPath || null,
+        status,
+        approvalStatus,
+        diffPercentage: result.diffPercentage || 0,
+        diffPixels: Math.round((result.diffPercentage || 0) * 1280 * 800), // Estimate pixels from percentage
+        dimensions: {
+          width: 1280, // Default dimensions - could be enhanced to read from image metadata
+          height: 800
+        },
+        testInfo: {
+          framework,
+          viewport: '1280x800',
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      };
+    });
+
+    // Add any deleted tests from approvals data that aren't in the comparison results
+    if (approvalsData && approvalsData.deleted.length > 0) {
+      const existingTestNames = results.map(r => r.name);
+      
+      approvalsData.deleted.forEach(deletedTest => {
+        if (!existingTestNames.includes(deletedTest)) {
+          results.push({
+            name: deletedTest,
+            baseline: '', // No baseline for deleted tests
+            current: '',  // No current for deleted tests
+            diff: null,
+            status: 'deleted',
+            approvalStatus: undefined,
+            diffPercentage: 0,
+            diffPixels: 0,
+            dimensions: {
+              width: 1280,
+              height: 800
+            },
+            testInfo: {
+              framework,
+              viewport: '1280x800',
+              userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+          });
+        }
+      });
+    }
+
+    return results;
   }
 
   /**
@@ -282,7 +418,8 @@ export class ReportGenerator {
   private async writeReportData(
     outputDir: string,
     reportData: ReportData,
-    historyData: HistoryData | null
+    historyData: HistoryData | null,
+    approvalsData?: ApprovalsData
   ): Promise<void> {
     // Write compare-report.json
     const reportPath = path.join(outputDir, 'compare-report.json');
@@ -292,6 +429,34 @@ export class ReportGenerator {
     if (historyData) {
       const historyPath = path.join(outputDir, 'history.json');
       fs.writeFileSync(historyPath, JSON.stringify(historyData, null, 2));
+    }
+
+    // Write approvals.json if available
+    if (approvalsData) {
+      const approvalsPath = path.join(outputDir, 'approvals.json');
+      fs.writeFileSync(approvalsPath, JSON.stringify(approvalsData, null, 2));
+    } else {
+      // Create a default approvals.json if none provided
+      const defaultApprovalsData: ApprovalsData = {
+        approved: [],
+        rejected: [],
+        new: [],
+        deleted: [],
+        meta: {
+          author: reportData.metadata.gitInfo.author || 'unknown',
+          timestamp: new Date().toISOString(),
+          commit_sha: reportData.metadata.gitInfo.sha,
+          commit_url: reportData.metadata.prInfo?.commitUrl || ''
+        }
+      };
+      
+      if (reportData.metadata.prInfo) {
+        defaultApprovalsData.meta.source = `GitHub PR #${reportData.metadata.prInfo.number}`;
+        defaultApprovalsData.meta.pr_url = reportData.metadata.prInfo.url;
+      }
+      
+      const approvalsPath = path.join(outputDir, 'approvals.json');
+      fs.writeFileSync(approvalsPath, JSON.stringify(defaultApprovalsData, null, 2));
     }
   }
 
@@ -364,8 +529,65 @@ export class ReportGenerator {
       }
 
       fs.writeFileSync(historyPath, JSON.stringify(historyData, null, 2));
+      
+      // Also update approvals.json
+      await this.updateApprovalsJson(decisions, outputPath);
     } catch (error) {
       throw new Error(`Failed to update history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+  
+  /**
+   * Update approvals.json with approval decisions
+   */
+  async updateApprovalsJson(
+    decisions: Record<string, { action: 'accept' | 'reject'; timestamp: string }>,
+    outputPath?: string
+  ): Promise<void> {
+    const approvalsPath = path.join(outputPath || this.outputPath, 'approvals.json');
+    
+    try {
+      let approvalsData: ApprovalsData;
+      
+      if (fs.existsSync(approvalsPath)) {
+        approvalsData = JSON.parse(fs.readFileSync(approvalsPath, 'utf8'));
+      } else {
+        // Create default approvals data
+        const gitInfo = await this.getGitInfo();
+        approvalsData = {
+          approved: [],
+          rejected: [],
+          new: [],
+          deleted: [],
+          meta: {
+            author: gitInfo.author,
+            timestamp: new Date().toISOString(),
+            commit_sha: gitInfo.sha,
+            commit_url: ''
+          }
+        };
+      }
+
+      // Update approvals based on decisions
+      for (const [testName, decision] of Object.entries(decisions)) {
+        // Remove from all categories first
+        approvalsData.approved = approvalsData.approved.filter(name => name !== testName);
+        approvalsData.rejected = approvalsData.rejected.filter(name => name !== testName);
+        
+        // Add to appropriate category
+        if (decision.action === 'accept') {
+          approvalsData.approved.push(testName);
+        } else if (decision.action === 'reject') {
+          approvalsData.rejected.push(testName);
+        }
+      }
+
+      // Update timestamp
+      approvalsData.meta.timestamp = new Date().toISOString();
+      
+      fs.writeFileSync(approvalsPath, JSON.stringify(approvalsData, null, 2));
+    } catch (error) {
+      throw new Error(`Failed to update approvals: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }

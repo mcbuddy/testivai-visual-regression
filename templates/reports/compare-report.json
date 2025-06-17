@@ -1,40 +1,59 @@
 {
   "metadata": {
-    "generatedAt": "2025-06-13T22:33:00Z",
+    "generatedAt": "2025-06-16T22:15:00Z",
     "gitInfo": {
-      "sha": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
-      "shortSha": "a1b2c3d",
-      "author": "John Doe",
-      "email": "john.doe@example.com",
+      "sha": "abc123def4567890abcdef1234567890abcdef12",
+      "shortSha": "abc123d",
+      "author": "mcbuddy",
+      "email": "mcbuddy@example.com",
       "date": "2025-06-13T20:15:00Z",
-      "message": "feat: update login form styling and improve responsive layout",
+      "message": "feat: update login form styling",
       "branch": "feature/login-ui"
     },
-    "totalTests": 4,
-    "changedTests": 2,
+    "totalTests": 5,
+    "changedTests": 1,
     "passedTests": 2,
     "framework": "playwright",
-    "testivaiVersion": "1.0.0"
+    "testivaiVersion": "1.0.0",
+    "prInfo": {
+      "number": "42",
+      "url": "https://github.com/testivai/testivai-visual-regression/pull/42",
+      "commitSha": "abc123def4567890abcdef1234567890abcdef12",
+      "commitUrl": "https://github.com/testivai/testivai-visual-regression/commit/abc123def4567890abcdef1234567890abcdef12"
+    }
   },
   "tests": [
     {
-      "name": "home-page",
-      "baseline": "baseline/home-page.png",
-      "current": "current/home-page.png",
-      "diff": "diff/home-page.diff.png",
-      "status": "changed",
-      "diffPercentage": 2.34,
-      "diffPixels": 1247,
+      "name": "login.png",
+      "baseline": "baseline/login.png",
+      "current": "current/login.png",
+      "diff": null,
+      "status": "passed",
+      "approvalStatus": "approved",
+      "diffPercentage": 0,
+      "diffPixels": 0,
       "dimensions": {
         "width": 1280,
         "height": 800
       },
-      "lastApproved": {
-        "gitSha": "d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9",
-        "shortSha": "d4e5f6g",
-        "author": "Jane Smith",
-        "date": "2025-06-12T14:30:00Z",
-        "message": "fix: button alignment issues"
+      "testInfo": {
+        "framework": "playwright",
+        "viewport": "1280x800",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    },
+    {
+      "name": "header.png",
+      "baseline": "baseline/header.png",
+      "current": "current/header.png",
+      "diff": null,
+      "status": "passed",
+      "approvalStatus": "approved",
+      "diffPercentage": 0,
+      "diffPixels": 0,
+      "dimensions": {
+        "width": 1280,
+        "height": 800
       },
       "testInfo": {
         "framework": "playwright",
@@ -43,23 +62,17 @@
       }
     },
     {
-      "name": "about-page",
-      "baseline": "baseline/about-page.png",
-      "current": "current/about-page.png",
-      "diff": "diff/about-page.diff.png",
+      "name": "settings.png",
+      "baseline": "baseline/settings.png",
+      "current": "current/settings.png",
+      "diff": "diff/settings.diff.png",
       "status": "changed",
-      "diffPercentage": 5.67,
-      "diffPixels": 3021,
+      "approvalStatus": "rejected",
+      "diffPercentage": 0.0234,
+      "diffPixels": 240,
       "dimensions": {
         "width": 1280,
-        "height": 1200
-      },
-      "lastApproved": {
-        "gitSha": "g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2",
-        "shortSha": "g7h8i9j",
-        "author": "Bob Wilson",
-        "date": "2025-06-11T09:45:00Z",
-        "message": "style: update color scheme and typography"
+        "height": 800
       },
       "testInfo": {
         "framework": "playwright",
@@ -68,23 +81,16 @@
       }
     },
     {
-      "name": "login-form",
-      "baseline": "baseline/login-form.png",
-      "current": "current/login-form.png",
+      "name": "signup.png",
+      "baseline": "",
+      "current": "current/signup.png",
       "diff": null,
-      "status": "passed",
+      "status": "new",
       "diffPercentage": 0,
       "diffPixels": 0,
       "dimensions": {
         "width": 1280,
-        "height": 600
-      },
-      "lastApproved": {
-        "gitSha": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
-        "shortSha": "a1b2c3d",
-        "author": "John Doe",
-        "date": "2025-06-13T20:15:00Z",
-        "message": "feat: update login form styling and improve responsive layout"
+        "height": 800
       },
       "testInfo": {
         "framework": "playwright",
@@ -93,23 +99,16 @@
       }
     },
     {
-      "name": "navigation-menu",
-      "baseline": "baseline/navigation-menu.png",
-      "current": "current/navigation-menu.png",
+      "name": "old-dashboard.png",
+      "baseline": "baseline/old-dashboard.png",
+      "current": "",
       "diff": null,
-      "status": "passed",
+      "status": "deleted",
       "diffPercentage": 0,
       "diffPixels": 0,
       "dimensions": {
         "width": 1280,
-        "height": 100
-      },
-      "lastApproved": {
-        "gitSha": "j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5",
-        "shortSha": "j0k1l2m",
-        "author": "Alice Brown",
-        "date": "2025-06-10T16:20:00Z",
-        "message": "feat: implement responsive navigation menu"
+        "height": 800
       },
       "testInfo": {
         "framework": "playwright",
@@ -117,5 +116,109 @@
         "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
       }
     }
-  ]
+  ],
+  "groupedTests": {
+    "approved": [
+      {
+        "name": "login.png",
+        "baseline": "baseline/login.png",
+        "current": "current/login.png",
+        "diff": null,
+        "status": "passed",
+        "approvalStatus": "approved",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      },
+      {
+        "name": "header.png",
+        "baseline": "baseline/header.png",
+        "current": "current/header.png",
+        "diff": null,
+        "status": "passed",
+        "approvalStatus": "approved",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "rejected": [
+      {
+        "name": "settings.png",
+        "baseline": "baseline/settings.png",
+        "current": "current/settings.png",
+        "diff": "diff/settings.diff.png",
+        "status": "changed",
+        "approvalStatus": "rejected",
+        "diffPercentage": 0.0234,
+        "diffPixels": 240,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "new": [
+      {
+        "name": "signup.png",
+        "baseline": "",
+        "current": "current/signup.png",
+        "diff": null,
+        "status": "new",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "deleted": [
+      {
+        "name": "old-dashboard.png",
+        "baseline": "baseline/old-dashboard.png",
+        "current": "",
+        "diff": null,
+        "status": "deleted",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "pending": []
+  }
 }

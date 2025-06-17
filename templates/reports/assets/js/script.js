@@ -5,10 +5,11 @@ class ReportManager {
   constructor() {
     this.reportData = null;
     this.historyData = null;
+    this.approvalsData = null;
     this.filteredTests = [];
     this.decisions = new Map();
     this.currentFilters = {
-      status: ['all'],
+      status: ['all', 'approved', 'rejected', 'new', 'deleted'],
       search: ''
     };
     this.init();
@@ -26,10 +27,11 @@ class ReportManager {
     try {
       this.showLoading(true);
       
-      // Load report data and history in parallel
-      const [reportResponse, historyResponse] = await Promise.all([
+      // Load report data, history, and approvals in parallel
+      const [reportResponse, historyResponse, approvalsResponse] = await Promise.all([
         fetch('compare-report.json'),
-        fetch('history.json')
+        fetch('history.json'),
+        fetch('approvals.json')
       ]);
 
       if (!reportResponse.ok) {
@@ -46,11 +48,29 @@ class ReportManager {
         this.historyData = { maxHistory: 5, commits: [] };
       }
 
+      // Approvals is optional
+      if (approvalsResponse.ok) {
+        this.approvalsData = await approvalsResponse.json();
+      } else {
+        console.warn('Approvals data not available');
+        this.approvalsData = { 
+          approved: [], 
+          rejected: [], 
+          new: [], 
+          deleted: [],
+          meta: {
+            author: this.reportData?.metadata?.gitInfo?.author || 'unknown',
+            timestamp: new Date().toISOString()
+          }
+        };
+      }
+
       // Load stored decisions
       this.loadStoredDecisions();
 
       // Initialize UI
       this.updateGitInfo();
+      this.updatePRInfo();
       this.updateSummaryStats();
       this.renderHistory();
       this.renderTests();
@@ -63,6 +83,62 @@ class ReportManager {
       console.error('Failed to load report:', error);
       this.showError('Failed to load report data. Please check if the files exist and try again.');
       this.showLoading(false);
+    }
+  }
+
+  // PR Information Display
+  updatePRInfo() {
+    if (!this.reportData?.metadata?.prInfo) return;
+
+    const prInfo = this.reportData.metadata.prInfo;
+    const headerRight = document.querySelector('.header-right');
+    
+    if (headerRight) {
+      const prInfoElement = document.createElement('div');
+      prInfoElement.className = 'pr-info';
+      prInfoElement.innerHTML = `
+        <div class="pr-number">
+          <a href="${prInfo.url}" target="_blank" rel="noopener noreferrer">PR #${prInfo.number}</a>
+        </div>
+        <div class="pr-commit">
+          <a href="${prInfo.commitUrl}" target="_blank" rel="noopener noreferrer" title="${prInfo.commitSha}">
+            ${prInfo.commitSha.substring(0, 7)}
+          </a>
+        </div>
+      `;
+      
+      // Insert before the theme toggle
+      const themeToggle = headerRight.querySelector('.theme-toggle');
+      if (themeToggle) {
+        headerRight.insertBefore(prInfoElement, themeToggle);
+      } else {
+        headerRight.appendChild(prInfoElement);
+      }
+    }
+
+    // Add meta information to the summary card
+    const summaryCard = document.querySelector('.summary-card');
+    if (summaryCard && this.approvalsData?.meta) {
+      const meta = this.approvalsData.meta;
+      const metaInfo = document.createElement('div');
+      metaInfo.className = 'meta-info';
+      metaInfo.innerHTML = `
+        <div class="meta-item">
+          <span class="meta-label">Author:</span>
+          <span class="meta-value">${meta.author}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Last Updated:</span>
+          <span class="meta-value">${new Date(meta.timestamp).toLocaleString()}</span>
+        </div>
+        ${meta.source ? `
+          <div class="meta-item">
+            <span class="meta-label">Source:</span>
+            <span class="meta-value">${meta.source}</span>
+          </div>
+        ` : ''}
+      `;
+      summaryCard.appendChild(metaInfo);
     }
   }
 
@@ -119,23 +195,53 @@ class ReportManager {
 
     const tests = this.reportData.tests;
     const totalTests = tests.length;
+    
+    // Count by status
     const changedTests = tests.filter(t => t.status === 'changed' || t.status === 'failed').length;
     const unchangedTests = tests.filter(t => t.status === 'passed').length;
+    const newTests = tests.filter(t => t.status === 'new').length;
+    const deletedTests = tests.filter(t => t.status === 'deleted').length;
+    
+    // Count by approval status
+    const approvedTests = tests.filter(t => t.approvalStatus === 'approved').length;
+    const rejectedTests = tests.filter(t => t.approvalStatus === 'rejected').length;
     
     // Count tests with decisions as pending review
-    const testsWithDecisions = Array.from(this.decisions.keys()).length;
-    const pendingTests = changedTests - testsWithDecisions;
+    const pendingTests = totalTests - approvedTests - rejectedTests;
 
     // Update summary stats
     this.updateStatElement('total-tests', totalTests);
     this.updateStatElement('changed-tests', changedTests);
     this.updateStatElement('unchanged-tests', unchangedTests);
     this.updateStatElement('pending-tests', Math.max(0, pendingTests));
+    
+    // Add new stats for approved, rejected, new, and deleted
+    this.updateOrCreateStatElement('approved-tests', approvedTests, 'approved');
+    this.updateOrCreateStatElement('rejected-tests', rejectedTests, 'rejected');
+    this.updateOrCreateStatElement('new-tests', newTests, 'new');
+    this.updateOrCreateStatElement('deleted-tests', deletedTests, 'deleted');
   }
 
   updateStatElement(id, value) {
     const element = document.getElementById(id);
     if (element) {
+      element.textContent = value;
+    }
+  }
+  
+  updateOrCreateStatElement(id, value, className) {
+    let element = document.getElementById(id);
+    const summaryStats = document.getElementById('summary-stats');
+    
+    if (!element && summaryStats) {
+      const statItem = document.createElement('div');
+      statItem.className = 'stat-item';
+      statItem.innerHTML = `
+        <div class="stat-value ${className}" id="${id}">${value}</div>
+        <div class="stat-label">${className.charAt(0).toUpperCase() + className.slice(1)}</div>
+      `;
+      summaryStats.appendChild(statItem);
+    } else if (element) {
       element.textContent = value;
     }
   }
@@ -251,20 +357,74 @@ class ReportManager {
     if (testResults) testResults.style.display = 'grid';
     if (emptyState) emptyState.style.display = 'none';
 
+    // Separate tests into changed and unchanged
+    const changedTests = this.filteredTests.filter(test => 
+      test.status === 'changed' || 
+      test.status === 'failed' || 
+      test.status === 'new' || 
+      test.status === 'deleted'
+    );
+    
+    const unchangedTests = this.filteredTests.filter(test => 
+      test.status === 'passed' && 
+      !test.approvalStatus // Only include tests that don't have an explicit approval status
+    );
+
     if (testResults) {
-      testResults.innerHTML = this.filteredTests.map(test => this.createTestCard(test)).join('');
+      // Render changed tests first
+      const changedTestsHtml = changedTests.map(test => this.createTestCard(test)).join('');
+      
+      // Create a collapsible section for unchanged tests
+      const unchangedTestsHtml = unchangedTests.length > 0 ? `
+        <div class="unchanged-tests-section">
+          <div class="unchanged-tests-header" id="unchanged-tests-toggle">
+            <h3>Unchanged Tests (${unchangedTests.length})</h3>
+            <button class="toggle-btn">
+              <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="6,9 12,15 18,9" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+          <div class="unchanged-tests-content" id="unchanged-tests-content" style="display: none;">
+            ${unchangedTests.map(test => this.createTestCard(test)).join('')}
+          </div>
+        </div>
+      ` : '';
+      
+      testResults.innerHTML = changedTestsHtml + unchangedTestsHtml;
       this.setupTestCardEvents();
+      this.setupUnchangedTestsToggle();
+    }
+  }
+  
+  setupUnchangedTestsToggle() {
+    const toggleBtn = document.getElementById('unchanged-tests-toggle');
+    const content = document.getElementById('unchanged-tests-content');
+    
+    if (toggleBtn && content) {
+      toggleBtn.addEventListener('click', () => {
+        const isHidden = content.style.display === 'none';
+        content.style.display = isHidden ? 'grid' : 'none';
+        
+        // Update the toggle icon
+        const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+        if (toggleIcon) {
+          toggleIcon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0)';
+        }
+      });
     }
   }
 
   createTestCard(test) {
     const decision = this.decisions.get(test.name);
-    const status = decision ? decision.action : test.status;
+    // Use approvalStatus from test if available, otherwise use decision
+    const approvalStatus = test.approvalStatus || (decision ? decision.action : null);
+    const status = approvalStatus || test.status;
     const statusClass = this.getStatusClass(status);
     const diffPercentage = test.diffPercentage || 0;
 
     return `
-      <div class="test-card ${decision ? 'decided' : ''}" 
+      <div class="test-card ${approvalStatus ? 'decided' : ''}" 
            data-test-name="${test.name}"
            data-baseline="${test.baseline}"
            data-current="${test.current}"
@@ -290,22 +450,28 @@ class ReportManager {
           </div>
         ` : ''}
 
-        <div class="image-comparison">
-          <div class="image-tabs">
-            <button class="image-tab active" data-image="current">Current</button>
-            <button class="image-tab" data-image="baseline">Baseline</button>
-            ${test.diff ? '<button class="image-tab" data-image="diff">Diff</button>' : ''}
-          </div>
-          
-          <div class="image-container" data-active-image="current">
-            <img src="${test.current}" alt="${test.name} - Current" class="comparison-image" />
-            <div class="image-overlay">
-              <button class="image-overlay-btn" title="View full size">
-                <svg class="image-overlay-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="currentColor" stroke-width="2"/>
-                </svg>
-              </button>
+        <div class="image-comparison side-by-side">
+          <div class="image-grid">
+            <div class="image-cell">
+              <div class="image-label">Baseline</div>
+              <div class="image-wrapper">
+                <img src="${test.baseline}" alt="${test.name} - Baseline" class="comparison-image" />
+              </div>
             </div>
+            <div class="image-cell">
+              <div class="image-label">Current</div>
+              <div class="image-wrapper">
+                <img src="${test.current}" alt="${test.name} - Current" class="comparison-image" />
+              </div>
+            </div>
+            ${test.diff ? `
+              <div class="image-cell">
+                <div class="image-label">Diff</div>
+                <div class="image-wrapper">
+                  <img src="${test.diff}" alt="${test.name} - Diff" class="comparison-image" />
+                </div>
+              </div>
+            ` : ''}
           </div>
         </div>
 
@@ -389,8 +555,12 @@ class ReportManager {
       case 'passed': return 'passed';
       case 'failed':
       case 'changed': return 'failed';
-      case 'accept': return 'passed';
-      case 'reject': return 'failed';
+      case 'accept':
+      case 'approved': return 'passed';
+      case 'reject':
+      case 'rejected': return 'failed';
+      case 'new': return 'new';
+      case 'deleted': return 'deleted';
       default: return 'pending';
     }
   }
@@ -399,11 +569,17 @@ class ReportManager {
     switch (status) {
       case 'passed':
       case 'accept':
+      case 'approved':
         return '<polyline points="20,6 9,17 4,12" stroke="currentColor" stroke-width="2"/>';
       case 'failed':
       case 'changed':
       case 'reject':
+      case 'rejected':
         return '<line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>';
+      case 'new':
+        return '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-size="12" fill="currentColor">N</text>';
+      case 'deleted':
+        return '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="8" y1="12" x2="16" y2="12" stroke="currentColor" stroke-width="2"/>';
       default:
         return '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2"/>';
     }
@@ -427,6 +603,28 @@ class ReportManager {
 
     this.decisions.set(testName, decision);
     this.storeDecisions();
+    
+    // Update approvals.json in memory
+    if (this.approvalsData) {
+      // Remove from all categories first
+      this.approvalsData.approved = this.approvalsData.approved.filter(name => name !== testName);
+      this.approvalsData.rejected = this.approvalsData.rejected.filter(name => name !== testName);
+      
+      // Add to appropriate category
+      if (action === 'accept') {
+        this.approvalsData.approved.push(testName);
+      } else if (action === 'reject') {
+        this.approvalsData.rejected.push(testName);
+      }
+      
+      // Update timestamp
+      this.approvalsData.meta.timestamp = new Date().toISOString();
+      
+      // Save to server (in a real implementation)
+      // For now, we'll just update the UI
+      console.log('Updated approvals.json in memory:', this.approvalsData);
+    }
+    
     this.renderTests(); // Re-render to update UI
     this.updateSummaryStats();
 
@@ -441,6 +639,20 @@ class ReportManager {
     if (this.decisions.has(testName)) {
       this.decisions.delete(testName);
       this.storeDecisions();
+      
+      // Update approvals.json in memory
+      if (this.approvalsData) {
+        // Remove from all categories
+        this.approvalsData.approved = this.approvalsData.approved.filter(name => name !== testName);
+        this.approvalsData.rejected = this.approvalsData.rejected.filter(name => name !== testName);
+        
+        // Update timestamp
+        this.approvalsData.meta.timestamp = new Date().toISOString();
+        
+        // Save to server (in a real implementation)
+        console.log('Updated approvals.json in memory after revert:', this.approvalsData);
+      }
+      
       this.renderTests();
       this.updateSummaryStats();
 
@@ -505,7 +717,7 @@ class ReportManager {
   updateFilters() {
     const checkedFilters = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
       .map(cb => cb.value)
-      .filter(value => ['all', 'changed', 'unchanged'].includes(value));
+      .filter(value => ['all', 'changed', 'unchanged', 'approved', 'rejected', 'new', 'deleted'].includes(value));
 
     this.currentFilters.status = checkedFilters.length > 0 ? checkedFilters : ['all'];
     this.renderTests();
@@ -516,6 +728,7 @@ class ReportManager {
       // Status filter for visual regression
       const decision = this.decisions.get(test.name);
       const effectiveStatus = decision ? decision.action : test.status;
+      const approvalStatus = test.approvalStatus;
       
       const statusMatch = this.currentFilters.status.includes('all') ||
         this.currentFilters.status.some(filter => {
@@ -524,6 +737,14 @@ class ReportManager {
               return test.status === 'changed' || test.status === 'failed';
             case 'unchanged': 
               return test.status === 'passed';
+            case 'approved':
+              return approvalStatus === 'approved' || effectiveStatus === 'accept';
+            case 'rejected':
+              return approvalStatus === 'rejected' || effectiveStatus === 'reject';
+            case 'new':
+              return test.status === 'new';
+            case 'deleted':
+              return test.status === 'deleted';
             default: 
               return true;
           }
@@ -546,7 +767,11 @@ class ReportManager {
   }
 
   exportDecisions() {
-    if (this.decisions.size === 0) {
+    if (this.decisions.size === 0 && (!this.approvalsData || 
+        (this.approvalsData.approved.length === 0 && 
+         this.approvalsData.rejected.length === 0 && 
+         this.approvalsData.new.length === 0 && 
+         this.approvalsData.deleted.length === 0))) {
       window.testivAI.componentManager.showToast(
         'No decisions to export',
         'warning'
@@ -554,13 +779,24 @@ class ReportManager {
       return;
     }
 
+    // Export both decisions and approvals
     const exportData = {
       metadata: {
         exportedAt: new Date().toISOString(),
         gitInfo: this.reportData?.metadata?.gitInfo,
         totalDecisions: this.decisions.size
       },
-      decisions: Object.fromEntries(this.decisions)
+      decisions: Object.fromEntries(this.decisions),
+      approvals: this.approvalsData || {
+        approved: [],
+        rejected: [],
+        new: [],
+        deleted: [],
+        meta: {
+          author: this.reportData?.metadata?.gitInfo?.author || 'unknown',
+          timestamp: new Date().toISOString()
+        }
+      }
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
@@ -570,14 +806,14 @@ class ReportManager {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `testivai-decisions-${exportData.metadata.gitInfo?.shortSha || 'unknown'}.json`;
+    a.download = `testivai-approvals-${exportData.metadata.gitInfo?.shortSha || 'unknown'}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     window.testivAI.componentManager.showToast(
-      'Decisions exported successfully',
+      'Approvals exported successfully',
       'success'
     );
   }

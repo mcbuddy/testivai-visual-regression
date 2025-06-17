@@ -2,7 +2,7 @@
 
 ## Current Work Focus
 
-The testivAI Visual Regression project has successfully evolved from a monorepo architecture to include a comprehensive, interactive HTML report system. The project now features a professional visual regression dashboard inspired by Allure reports, with Git short SHA-based history management and client-side interactivity.
+The testivAI Visual Regression project has successfully evolved from a monorepo architecture to include a comprehensive, interactive HTML report system. The project now features a professional visual regression dashboard inspired by Allure reports, with Git short SHA-based history management, client-side interactivity, and an enhanced approvals system.
 
 **Enhanced Project Structure:**
 ```
@@ -35,6 +35,7 @@ Current priorities:
 10. **Selenium Plugin with CDP Integration**: Complete Selenium plugin with Chrome DevTools Protocol integration ✅
 11. **Puppeteer Plugin Implementation**: Complete Puppeteer plugin with comprehensive testing ✅
 12. **Cypress Plugin Implementation**: Complete Cypress plugin with comprehensive testing ✅
+13. **Approvals System**: Enhanced report with approvals.json integration and status tracking ✅
 
 The project continues to build on the foundation of a TypeScript SDK for visual regression testing that integrates with multiple testing frameworks. The primary goals have been updated to reflect the enhanced reporting capabilities:
 
@@ -51,6 +52,21 @@ The project continues to build on the foundation of a TypeScript SDK for visual 
 ## Recent Changes
 
 The following major implementations have been completed:
+
+1. **Enhanced Visual Regression Report with Approvals System** ✅:
+   - Implemented approvals.json integration for tracking image status
+   - Added support for grouping images by status: approved, rejected, new, and deleted
+   - Enhanced UI with side-by-side image comparison (baseline, current, diff)
+   - Added status labels and filtering by approval status
+   - Implemented PR metadata display with commit information
+   - Updated report UI to show approval status and allow updating via UI
+   - Added export functionality to save approvals.json with current status
+   - Implemented comprehensive test coverage for approvals functionality
+   - Added collapsible section for unchanged/passed images to focus on changed images
+   - Implemented toggle functionality to show/hide unchanged tests
+   - Added styling for the collapsible section with visual cues
+   - Added tests for the collapsible unchanged tests section
+
 
 1. **Monorepo Structure Implementation** ✅:
    - Created npm workspaces configuration in root package.json

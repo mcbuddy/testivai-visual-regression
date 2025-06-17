@@ -120,6 +120,41 @@ describe('ReportGenerator', () => {
         './test-report/compare-report.json',
         expect.stringContaining('"framework": "playwright"')
       );
+      // Should create a default approvals.json file
+      expect(mockFs.writeFileSync).toHaveBeenCalledWith(
+        './test-report/approvals.json',
+        expect.stringContaining('"approved": []')
+      );
+    });
+
+    it('should use provided approvals data when available', async () => {
+      const outputPath = './test-report';
+      const approvalsData = {
+        approved: ['test1.png', 'test2.png'],
+        rejected: ['test3.png'],
+        new: ['test4.png'],
+        deleted: ['test5.png'],
+        meta: {
+          author: 'Test User',
+          timestamp: '2025-06-13T12:00:00Z',
+          source: 'GitHub PR #123',
+          pr_url: 'https://github.com/example/repo/pull/123',
+          commit_sha: 'abcdef1234567890',
+          commit_url: 'https://github.com/example/repo/commit/abcdef1234567890'
+        }
+      };
+      
+      const result = await reportGenerator.generateReport(mockComparisonResults, {
+        framework: 'playwright',
+        outputPath,
+        approvalsData
+      });
+
+      expect(result).toBe('./test-report/index.html');
+      expect(mockFs.writeFileSync).toHaveBeenCalledWith(
+        './test-report/approvals.json',
+        expect.stringContaining('"approved": ["test1.png", "test2.png"]')
+      );
     });
 
     it('should handle empty comparison results', async () => {
@@ -225,6 +260,148 @@ describe('ReportGenerator', () => {
         }
       });
     });
+    
+    it('should generate a report with collapsible unchanged tests section', async () => {
+      // Mock the HTML template to check for the collapsible section
+      mockFs.readFileSync.mockImplementation((path) => {
+        if (path.toString().includes('index.html')) {
+          return `
+            <!DOCTYPE html>
+            <html>
+              <body>
+                <div id="test-results"></div>
+              </body>
+            </html>
+          `;
+        }
+        return '{}';
+      });
+      
+      // Create a mix of changed and unchanged tests
+      const mixedResults = [
+        ...mockComparisonResults,
+        {
+          name: 'unchanged-test',
+          baselinePath: 'baseline/unchanged-test.png',
+          comparePath: 'current/unchanged-test.png',
+          diffPath: null,
+          passed: true,
+          diffPercentage: 0,
+          threshold: 0.1
+        }
+      ];
+      
+      await reportGenerator.generateReport(mixedResults, {
+        framework: 'cypress'
+      });
+      
+      // Check that the HTML file was written
+      const htmlCall = mockFs.writeFileSync.mock.calls.find(call => 
+        call[0].toString().includes('index.html')
+      );
+      
+      expect(htmlCall).toBeDefined();
+      
+      // Check that the report data includes the unchanged test
+      const reportCall = mockFs.writeFileSync.mock.calls.find(call => 
+        call[0].toString().includes('compare-report.json')
+      );
+      
+      expect(reportCall).toBeDefined();
+      const reportData: ReportData = JSON.parse(reportCall![1] as string);
+      
+      // Verify we have both changed and unchanged tests
+      const changedTests = reportData.tests.filter(t => t.status === 'changed' || t.status === 'failed');
+      const unchangedTests = reportData.tests.filter(t => t.status === 'passed');
+      
+      expect(changedTests.length).toBeGreaterThan(0);
+      expect(unchangedTests.length).toBeGreaterThan(0);
+      expect(unchangedTests[0].name).toBe('unchanged-test');
+    });
+
+    it('should apply approval status from approvals data', async () => {
+      const approvalsData = {
+        approved: ['home-page'],
+        rejected: ['login-form'],
+        new: [],
+        deleted: [],
+        meta: {
+          author: 'Test User',
+          timestamp: '2025-06-13T12:00:00Z'
+        }
+      };
+
+      await reportGenerator.generateReport(mockComparisonResults, {
+        framework: 'cypress',
+        approvalsData
+      });
+
+      const reportCall = mockFs.writeFileSync.mock.calls.find(call => 
+        call[0].toString().includes('compare-report.json')
+      );
+      
+      expect(reportCall).toBeDefined();
+      const reportData: ReportData = JSON.parse(reportCall![1] as string);
+      
+      // Check that the tests have the correct approval status
+      const homePageTest = reportData.tests.find(t => t.name === 'home-page');
+      const loginFormTest = reportData.tests.find(t => t.name === 'login-form');
+      
+      expect(homePageTest?.approvalStatus).toBe('approved');
+      expect(loginFormTest?.approvalStatus).toBe('rejected');
+    });
+
+    it('should group tests by status correctly', async () => {
+      const approvalsData = {
+        approved: ['home-page'],
+        rejected: ['login-form'],
+        new: ['new-test'],
+        deleted: ['deleted-test'],
+        meta: {
+          author: 'Test User',
+          timestamp: '2025-06-13T12:00:00Z'
+        }
+      };
+
+      // Add a new test and a deleted test to the comparison results
+      const extendedResults = [
+        ...mockComparisonResults,
+        {
+          name: 'new-test',
+          baselinePath: 'baseline/new-test.png',
+          comparePath: 'current/new-test.png',
+          diffPath: 'diff/new-test.diff.png',
+          passed: false,
+          diffPercentage: 100,
+          threshold: 0.1
+        }
+      ];
+
+      await reportGenerator.generateReport(extendedResults, {
+        framework: 'cypress',
+        approvalsData
+      });
+
+      const reportCall = mockFs.writeFileSync.mock.calls.find(call => 
+        call[0].toString().includes('compare-report.json')
+      );
+      
+      expect(reportCall).toBeDefined();
+      const reportData: ReportData = JSON.parse(reportCall![1] as string);
+      
+      // Check that the tests are grouped correctly
+      expect(reportData.groupedTests).toBeDefined();
+      expect(reportData.groupedTests?.approved.length).toBe(1);
+      expect(reportData.groupedTests?.rejected.length).toBe(1);
+      expect(reportData.groupedTests?.new.length).toBe(1);
+      expect(reportData.groupedTests?.deleted.length).toBe(1);
+      
+      // Verify the test names in each group
+      expect(reportData.groupedTests?.approved[0].name).toBe('home-page');
+      expect(reportData.groupedTests?.rejected[0].name).toBe('login-form');
+      expect(reportData.groupedTests?.new[0].name).toBe('new-test');
+      expect(reportData.groupedTests?.deleted[0].name).toBe('deleted-test');
+    });
 
     it('should calculate summary statistics correctly', async () => {
       await reportGenerator.generateReport(mockComparisonResults);
@@ -258,6 +435,115 @@ describe('ReportGenerator', () => {
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         './test-output/history.json',
         expect.stringContaining('"maxHistory": 5')
+      );
+    });
+    
+    it('should generate a report with approvals.json integration', async () => {
+      const approvalsData = {
+        approved: ['approved-test.png'],
+        rejected: ['rejected-test.png'],
+        new: ['new-test.png'],
+        deleted: ['deleted-test.png'],
+        meta: {
+          author: 'Test User',
+          timestamp: '2025-06-13T12:00:00Z',
+          source: 'GitHub PR #123',
+          pr_url: 'https://github.com/example/repo/pull/123',
+          commit_sha: 'abcdef1234567890',
+          commit_url: 'https://github.com/example/repo/commit/abcdef1234567890'
+        }
+      };
+      
+      // Create test results that match the approvals data
+      const testResults = [
+        {
+          name: 'approved-test.png',
+          baselinePath: 'baseline/approved-test.png',
+          comparePath: 'current/approved-test.png',
+          diffPath: null,
+          passed: true,
+          diffPercentage: 0,
+          threshold: 0.1
+        },
+        {
+          name: 'rejected-test.png',
+          baselinePath: 'baseline/rejected-test.png',
+          comparePath: 'current/rejected-test.png',
+          diffPath: 'diff/rejected-test.diff.png',
+          passed: false,
+          diffPercentage: 0.05,
+          threshold: 0.1
+        },
+        {
+          name: 'new-test.png',
+          baselinePath: '',
+          comparePath: 'current/new-test.png',
+          diffPath: null,
+          passed: false,
+          diffPercentage: 100,
+          threshold: 0.1
+        }
+      ];
+      
+      await reportGenerator.generateReport(testResults, {
+        framework: 'cypress',
+        approvalsData
+      });
+      
+      // Check that approvals.json was written
+      const approvalsCall = mockFs.writeFileSync.mock.calls.find(call => 
+        call[0].toString().includes('approvals.json')
+      );
+      
+      expect(approvalsCall).toBeDefined();
+      const writtenApprovalsData = JSON.parse(approvalsCall![1] as string);
+      
+      // Verify the approvals data was written correctly
+      expect(writtenApprovalsData.approved).toContain('approved-test.png');
+      expect(writtenApprovalsData.rejected).toContain('rejected-test.png');
+      expect(writtenApprovalsData.new).toContain('new-test.png');
+      expect(writtenApprovalsData.deleted).toContain('deleted-test.png');
+      expect(writtenApprovalsData.meta.author).toBe('Test User');
+      
+      // Check that the report data includes approval status
+      const reportCall = mockFs.writeFileSync.mock.calls.find(call => 
+        call[0].toString().includes('compare-report.json')
+      );
+      
+      expect(reportCall).toBeDefined();
+      const reportData: ReportData = JSON.parse(reportCall![1] as string);
+      
+      // Verify approval status is applied to tests
+      const approvedTest = reportData.tests.find(t => t.name === 'approved-test.png');
+      const rejectedTest = reportData.tests.find(t => t.name === 'rejected-test.png');
+      const newTest = reportData.tests.find(t => t.name === 'new-test.png');
+      
+      expect(approvedTest?.approvalStatus).toBe('approved');
+      expect(rejectedTest?.approvalStatus).toBe('rejected');
+      expect(newTest?.status).toBe('new');
+      
+      // Verify tests are grouped correctly
+      expect(reportData.groupedTests?.approved.length).toBeGreaterThan(0);
+      expect(reportData.groupedTests?.rejected.length).toBeGreaterThan(0);
+      expect(reportData.groupedTests?.new.length).toBeGreaterThan(0);
+      expect(reportData.groupedTests?.deleted.length).toBeGreaterThan(0);
+    });
+
+    it('should update approvals.json when updating history', async () => {
+      mockFs.existsSync.mockImplementation((path) => {
+        return !path.toString().includes('history.json') && !path.toString().includes('approvals.json');
+      });
+
+      await reportGenerator.updateHistory(mockDecisions, './test-output');
+
+      // Check that approvals.json was updated
+      expect(mockFs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('approvals.json'),
+        expect.stringContaining('"approved": ["home-page"]')
+      );
+      expect(mockFs.writeFileSync).toHaveBeenCalledWith(
+        expect.stringContaining('approvals.json'),
+        expect.stringContaining('"rejected": ["login-form"]')
       );
     });
 
