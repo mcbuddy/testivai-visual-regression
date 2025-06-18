@@ -1,0 +1,63 @@
+name: Version Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version type (patch, minor, major)'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      package:
+        description: 'Package to version (all, sdk, cli)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - sdk
+          - cli
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Version SDK package
+        if: ${{ github.event.inputs.package == 'sdk' || github.event.inputs.package == 'all' }}
+        run: |
+          cd packages/testivai-visual-regression
+          npm version ${{ github.event.inputs.version_type }} -m "Bump SDK version to %s"
+
+      - name: Version CLI package
+        if: ${{ github.event.inputs.package == 'cli' || github.event.inputs.package == 'all' }}
+        run: |
+          cd packages/testivai-cli
+          npm version ${{ github.event.inputs.version_type }} -m "Bump CLI version to %s"
+
+      - name: Push changes
+        run: |
+          git push
+          git push --tags

@@ -35,3 +35,6 @@ Thumbs.db
 
 # TestivaiVR specific
 .testivai/
+
+# Memory bank (local documentation)
+memory-bank/
