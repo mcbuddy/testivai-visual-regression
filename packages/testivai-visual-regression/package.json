@@ -1,14 +1,24 @@
 {
   "name": "testivai-visual-regression",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "A TypeScript SDK for visual regression testing that integrates with multiple testing frameworks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "templates/**/*"
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/testivai/testivai-visual-regression.git",
+    "directory": "packages/testivai-visual-regression"
+  },
+  "homepage": "https://github.com/testivai/testivai-visual-regression#readme",
+  "bugs": {
+    "url": "https://github.com/testivai/testivai-visual-regression/issues"
   },
   "scripts": {
     "build": "tsc",
@@ -29,7 +39,7 @@
     "puppeteer",
     "selenium"
   ],
-  "author": "",
+  "author": "Budi Sugianto",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.14",

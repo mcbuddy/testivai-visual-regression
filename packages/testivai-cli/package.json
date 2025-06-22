@@ -1,6 +1,6 @@
 {
   "name": "testivai-cli",
-  "version": "1.0.0",
+  "version": "1.0.7",
   "description": "CLI tool for testivAI Visual Regression testing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,6 +12,15 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/testivai/testivai-visual-regression.git",
+    "directory": "packages/testivai-cli"
+  },
+  "homepage": "https://github.com/testivai/testivai-visual-regression#readme",
+  "bugs": {
+    "url": "https://github.com/testivai/testivai-visual-regression/issues"
   },
   "scripts": {
     "build": "tsc",
@@ -29,7 +38,7 @@
     "screenshot",
     "comparison"
   ],
-  "author": "",
+  "author": "Budi Sugianto",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -42,7 +51,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "testivai-visual-regression": "^1.0.0",
+    "testivai-visual-regression": "^1.0.4",
     "chalk": "^4.1.2"
   }
 }

@@ -4,7 +4,7 @@ A comprehensive TypeScript SDK and CLI for visual regression testing that integr
 
 ## Packages
 
-This monorepo contains two packages:
+This monorepo contains the following packages:
 
 ### 📦 [testivai-visual-regression](./packages/testivai-visual-regression)
 
@@ -34,6 +34,20 @@ npm install -g testivai-cli
 - Compare screenshots with `testivai compare`
 - Update baselines with `--update-baselines`
 - Comprehensive help system
+
+### 💎 [testivai-ruby](./packages/testivai-ruby)
+
+Ruby gem for testivAI Visual Regression that integrates with RSpec and Capybara.
+
+```ruby
+gem 'testivai-ruby'
+```
+
+**Features:**
+- RSpec integration with custom matchers
+- Capybara support for browser automation
+- Remote debugging port connection
+- Flexible configuration options
 
 ## Quick Start
 
@@ -146,6 +160,7 @@ npm run lint
 - **Cypress** - Custom commands and plugin architecture
 - **Puppeteer** - Page event listeners and custom hooks
 - **Selenium** - WebDriver extensions and event listeners
+- **RSpec/Capybara** - Ruby integration via testivai-ruby gem
 
 ## Features
 
@@ -171,6 +186,7 @@ npm run lint
 
 - [SDK Documentation](./packages/testivai-visual-regression/README.md)
 - [CLI Documentation](./packages/testivai-cli/README.md)
+- [Ruby Gem Documentation](./packages/testivai-ruby/README.md)
 - [Publishing Guide](./PUBLISHING.md)
 
 ## Contributing

@@ -102,10 +102,35 @@ export class testivAI {
   
   /**
    * Generate a report of comparison results
+   * @param comparisonResults Comparison results to include in the report
+   * @param options Report generation options
    * @returns Path to the generated report
    */
-  public async generateReport(): Promise<string> {
-    // This will be implemented in the report module
-    return `${this.options.reportDir}/index.html`;
+  public async generateReport(
+    comparisonResults: import('../core/interfaces').ComparisonResult[],
+    options?: {
+      framework?: string;
+      outputPath?: string;
+      includeHistory?: boolean;
+      approvalsData?: import('../report').ApprovalsData;
+      prInfo?: {
+        number: string;
+        url: string;
+        commitSha: string;
+        commitUrl: string;
+      };
+    }
+  ): Promise<string> {
+    // Import the report generator to avoid circular dependencies
+    const { reportGenerator } = await import('../report');
+    
+    // Generate the report using the report generator
+    return reportGenerator.generateReport(comparisonResults, {
+      framework: options?.framework || this.options.framework,
+      outputPath: options?.outputPath || this.options.reportDir,
+      includeHistory: options?.includeHistory,
+      approvalsData: options?.approvalsData,
+      prInfo: options?.prInfo
+    });
   }
 }

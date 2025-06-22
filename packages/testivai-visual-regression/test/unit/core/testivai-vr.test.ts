@@ -159,4 +159,104 @@ describe('testivAI', () => {
       expect(instance.getPluginFramework(mockPlugin)).toBe('unknown');
     });
   });
+  
+  describe('generateReport', () => {
+    // Mock the report module
+    jest.mock('../../../src/report', () => ({
+      reportGenerator: {
+        generateReport: jest.fn().mockResolvedValue('report-path/index.html')
+      }
+    }));
+    
+    it('should call the report generator with the correct parameters', async () => {
+      const options: testivAIOptions = {
+        framework: 'playwright',
+        baselineDir: '.testivAI/visual-regression/baseline',
+        reportDir: 'custom-reports'
+      };
+      
+      const instance = testivAI.init(options);
+      
+      // Import the mocked report generator
+      const { reportGenerator } = require('../../../src/report');
+      
+      // Create mock comparison results
+      const mockComparisonResults = [
+        {
+          name: 'test-screenshot',
+          baselinePath: 'baseline/test-screenshot.png',
+          comparePath: 'compare/test-screenshot.png',
+          diffPath: 'diff/test-screenshot.png',
+          passed: true,
+          diffPercentage: 0,
+          threshold: 0.1
+        }
+      ];
+      
+      // Call generateReport
+      const result = await instance.generateReport(mockComparisonResults, {
+        framework: 'playwright',
+        outputPath: 'custom-output'
+      });
+      
+      // Verify the report generator was called with the correct parameters
+      expect(reportGenerator.generateReport).toHaveBeenCalledWith(
+        mockComparisonResults,
+        {
+          framework: 'playwright',
+          outputPath: 'custom-output',
+          includeHistory: undefined,
+          approvalsData: undefined,
+          prInfo: undefined
+        }
+      );
+      
+      // Verify the result is the path returned by the report generator
+      expect(result).toBe('report-path/index.html');
+    });
+    
+    it('should use default options if not provided', async () => {
+      const options: testivAIOptions = {
+        framework: 'playwright',
+        baselineDir: '.testivAI/visual-regression/baseline',
+        reportDir: 'custom-reports'
+      };
+      
+      const instance = testivAI.init(options);
+      
+      // Import the mocked report generator
+      const { reportGenerator } = require('../../../src/report');
+      
+      // Reset the mock to clear previous calls
+      reportGenerator.generateReport.mockClear();
+      
+      // Create mock comparison results
+      const mockComparisonResults = [
+        {
+          name: 'test-screenshot',
+          baselinePath: 'baseline/test-screenshot.png',
+          comparePath: 'compare/test-screenshot.png',
+          diffPath: 'diff/test-screenshot.png',
+          passed: true,
+          diffPercentage: 0,
+          threshold: 0.1
+        }
+      ];
+      
+      // Call generateReport without options
+      await instance.generateReport(mockComparisonResults);
+      
+      // Verify the report generator was called with default options
+      expect(reportGenerator.generateReport).toHaveBeenCalledWith(
+        mockComparisonResults,
+        {
+          framework: 'playwright',
+          outputPath: 'custom-reports',
+          includeHistory: undefined,
+          approvalsData: undefined,
+          prInfo: undefined
+        }
+      );
+    });
+  });
 });

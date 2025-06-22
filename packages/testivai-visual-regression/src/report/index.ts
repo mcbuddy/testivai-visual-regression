@@ -114,7 +114,23 @@ export class ReportGenerator {
   private outputPath: string;
 
   constructor(templatePath?: string, outputPath?: string) {
-    this.templatePath = templatePath || path.join(__dirname, '../../../templates/reports');
+    // Look for templates in the package's templates directory
+    // Try different paths to find the templates
+    const possiblePaths = [
+      path.join(__dirname, '../../../templates/reports'), // Local development
+      path.join(__dirname, '../../templates/reports'),    // Published package
+      path.join(process.cwd(), 'node_modules/testivai-visual-regression/templates/reports') // Installed package
+    ];
+    
+    // Find the first path that exists
+    this.templatePath = templatePath || possiblePaths.find(p => {
+      try {
+        return fs.existsSync(p);
+      } catch (e) {
+        return false;
+      }
+    }) || possiblePaths[0]; // Default to the first path if none exist
+    
     this.outputPath = outputPath || './testivai-report';
   }
 
