@@ -437,23 +437,9 @@ export class ReportGenerator {
     historyData: HistoryData | null,
     approvalsData?: ApprovalsData
   ): Promise<void> {
-    // Write compare-report.json
-    const reportPath = path.join(outputDir, 'compare-report.json');
-    fs.writeFileSync(reportPath, JSON.stringify(reportData, null, 2));
-
-    // Write history.json if available
-    if (historyData) {
-      const historyPath = path.join(outputDir, 'history.json');
-      fs.writeFileSync(historyPath, JSON.stringify(historyData, null, 2));
-    }
-
-    // Write approvals.json if available
-    if (approvalsData) {
-      const approvalsPath = path.join(outputDir, 'approvals.json');
-      fs.writeFileSync(approvalsPath, JSON.stringify(approvalsData, null, 2));
-    } else {
-      // Create a default approvals.json if none provided
-      const defaultApprovalsData: ApprovalsData = {
+    // Create default approvals data if none provided
+    if (!approvalsData) {
+      approvalsData = {
         approved: [],
         rejected: [],
         new: [],
@@ -467,12 +453,117 @@ export class ReportGenerator {
       };
       
       if (reportData.metadata.prInfo) {
-        defaultApprovalsData.meta.source = `GitHub PR #${reportData.metadata.prInfo.number}`;
-        defaultApprovalsData.meta.pr_url = reportData.metadata.prInfo.url;
+        approvalsData.meta.source = `GitHub PR #${reportData.metadata.prInfo.number}`;
+        approvalsData.meta.pr_url = reportData.metadata.prInfo.url;
+      }
+    }
+
+    // Write compare-report.json
+    const reportPath = path.join(outputDir, 'compare-report.json');
+    fs.writeFileSync(reportPath, JSON.stringify(reportData, null, 2));
+
+    // Write history.json if available
+    if (historyData) {
+      const historyPath = path.join(outputDir, 'history.json');
+      fs.writeFileSync(historyPath, JSON.stringify(historyData, null, 2));
+    }
+
+    // Write approvals.json
+    const approvalsPath = path.join(outputDir, 'approvals.json');
+    fs.writeFileSync(approvalsPath, JSON.stringify(approvalsData, null, 2));
+
+    // Embed data in HTML file to avoid CORS issues when viewing locally
+    this.embedDataInHtml(outputDir, reportData, historyData || { maxHistory: 5, commits: [] }, approvalsData);
+  }
+
+  /**
+   * Embed report data directly in the HTML file to avoid CORS issues when viewing locally
+   */
+  private embedDataInHtml(
+    outputDir: string,
+    reportData: ReportData,
+    historyData: HistoryData,
+    approvalsData: ApprovalsData
+  ): void {
+    const indexHtmlPath = path.join(outputDir, 'index.html');
+    
+    // Check if index.html exists
+    if (!fs.existsSync(indexHtmlPath)) {
+      console.warn('index.html not found, skipping data embedding');
+      return;
+    }
+
+    try {
+      // Read the HTML file
+      let htmlContent = fs.readFileSync(indexHtmlPath, 'utf8');
+
+      // Create script tag with embedded data
+      const scriptContent = `
+<!-- Embedded report data to avoid CORS issues when viewing locally -->
+<script>
+  // Pre-loaded report data
+  window.testivAI = window.testivAI || {};
+  window.testivAI.embeddedData = {
+    reportData: ${JSON.stringify(reportData)},
+    historyData: ${JSON.stringify(historyData)},
+    approvalsData: ${JSON.stringify(approvalsData)}
+  };
+</script>
+`;
+
+      // Insert script tag before the closing </head> tag
+      htmlContent = htmlContent.replace('</head>', `${scriptContent}</head>`);
+
+      // Modify the script.js to use embedded data if fetch fails
+      const scriptJsPath = path.join(outputDir, 'assets', 'js', 'script.js');
+      if (fs.existsSync(scriptJsPath)) {
+        let scriptContent = fs.readFileSync(scriptJsPath, 'utf8');
+        
+        // Find the loadReport method
+        const loadReportMethodRegex = /async loadReport\(\) \{[\s\S]*?try \{[\s\S]*?this\.showLoading\(true\);/;
+        const loadReportMethod = scriptContent.match(loadReportMethodRegex);
+        
+        if (loadReportMethod) {
+          // Add code to use embedded data if fetch fails
+          const modifiedLoadReportMethod = `async loadReport() {
+    try {
+      this.showLoading(true);
+      
+      // Check if we have embedded data
+      if (window.testivAI && window.testivAI.embeddedData) {
+        console.log('Using embedded data');
+        this.reportData = window.testivAI.embeddedData.reportData;
+        this.historyData = window.testivAI.embeddedData.historyData;
+        this.approvalsData = window.testivAI.embeddedData.approvalsData;
+        
+        // Load stored decisions
+        this.loadStoredDecisions();
+
+        // Initialize UI
+        this.updateGitInfo();
+        this.updatePRInfo();
+        this.updateSummaryStats();
+        this.renderHistory();
+        this.renderTests();
+        this.setupFilters();
+        this.setupExport();
+
+        this.showLoading(false);
+        return;
       }
       
-      const approvalsPath = path.join(outputDir, 'approvals.json');
-      fs.writeFileSync(approvalsPath, JSON.stringify(defaultApprovalsData, null, 2));
+      // If no embedded data, try to fetch from files
+      console.log('Fetching data from files');`;
+          
+          scriptContent = scriptContent.replace(loadReportMethodRegex, modifiedLoadReportMethod);
+          fs.writeFileSync(scriptJsPath, scriptContent);
+        }
+      }
+
+      // Write the modified HTML file
+      fs.writeFileSync(indexHtmlPath, htmlContent);
+    } catch (error) {
+      console.error('Failed to embed data in HTML:', error);
     }
   }
 

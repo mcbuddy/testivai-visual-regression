@@ -1,6 +1,6 @@
 {
   "name": "testivai-cli",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "CLI tool for testivAI Visual Regression testing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -51,7 +51,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "testivai-visual-regression": "^1.0.4",
+    "testivai-visual-regression": "^1.0.5",
     "chalk": "^4.1.2"
   }
 }
