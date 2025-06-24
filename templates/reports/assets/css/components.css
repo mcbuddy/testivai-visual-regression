@@ -25,8 +25,8 @@
 
 .test-card-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
@@ -36,7 +36,6 @@
   color: var(--color-text-primary);
   margin: 0;
   flex: 1;
-  margin-right: var(--space-3);
 }
 
 .test-card-select {
@@ -44,6 +43,7 @@
   height: var(--space-5);
   accent-color: var(--testivai-primary);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 /* Status Badge */
@@ -147,6 +147,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-3);
+}
+
+.image-grid.with-diff {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.image-grid.no-diff {
+  grid-template-columns: 1fr 1fr;
 }
 
 .image-cell {
@@ -776,6 +784,23 @@
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
+}
+
+/* Unchanged Test Cards - Leaner Style */
+.test-card.unchanged {
+  padding: var(--space-3);
+}
+
+.test-card.unchanged .image-comparison {
+  margin-bottom: var(--space-2);
+}
+
+.test-card.unchanged .image-grid {
+  gap: var(--space-2);
+}
+
+.test-card.unchanged .image-wrapper {
+  aspect-ratio: 16 / 9;
 }
 
 .unchanged-tests-header {

@@ -1,6 +1,6 @@
 {
   "name": "testivai-visual-regression",
-  "version": "1.0.5",
+  "version": "1.0.9",
   "description": "A TypeScript SDK for visual regression testing that integrates with multiple testing frameworks.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

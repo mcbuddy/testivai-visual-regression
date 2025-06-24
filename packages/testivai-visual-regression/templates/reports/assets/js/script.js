@@ -422,6 +422,12 @@ class ReportManager {
     const status = approvalStatus || test.status;
     const statusClass = this.getStatusClass(status);
     const diffPercentage = test.diffPercentage || 0;
+    
+    // Determine if this is an unchanged test
+    const isUnchanged = test.status === 'passed' && !test.approvalStatus;
+    
+    // Only show action buttons for changed tests, never for unchanged tests
+    const showActions = !isUnchanged;
 
     return `
       <div class="test-card ${approvalStatus ? 'decided' : ''}" 
@@ -475,37 +481,39 @@ class ReportManager {
           </div>
         </div>
 
-        <div class="test-actions">
-          <button class="test-action-btn accept" 
-                  onclick="window.testivAI.reportManager.approveTest('${test.name}')"
-                  ${decision?.action === 'accept' ? 'disabled' : ''}>
-            <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <polyline points="20,6 9,17 4,12" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            ${decision?.action === 'accept' ? 'Accepted' : 'Accept'}
-          </button>
-          
-          <button class="test-action-btn reject" 
-                  onclick="window.testivAI.reportManager.rejectTest('${test.name}')"
-                  ${decision?.action === 'reject' ? 'disabled' : ''}>
-            <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
-              <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            ${decision?.action === 'reject' ? 'Rejected' : 'Reject'}
-          </button>
-
-          ${decision ? `
-            <button class="test-action-btn revert" 
-                    onclick="window.testivAI.reportManager.revertDecision('${test.name}')">
+        ${showActions ? `
+          <div class="test-actions">
+            <button class="test-action-btn accept" 
+                    onclick="window.testivAI.reportManager.approveTest('${test.name}')"
+                    ${decision?.action === 'accept' ? 'disabled' : ''}>
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <polyline points="1,4 1,10 7,10" stroke="currentColor" stroke-width="2"/>
-                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2"/>
+                <polyline points="20,6 9,17 4,12" stroke="currentColor" stroke-width="2"/>
               </svg>
-              Revert
+              ${decision?.action === 'accept' ? 'Accepted' : 'Accept'}
             </button>
-          ` : ''}
-        </div>
+            
+            <button class="test-action-btn reject" 
+                    onclick="window.testivAI.reportManager.rejectTest('${test.name}')"
+                    ${decision?.action === 'reject' ? 'disabled' : ''}>
+              <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
+                <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              ${decision?.action === 'reject' ? 'Rejected' : 'Reject'}
+            </button>
+
+            ${decision ? `
+              <button class="test-action-btn revert" 
+                      onclick="window.testivAI.reportManager.revertDecision('${test.name}')">
+                <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <polyline points="1,4 1,10 7,10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Revert
+              </button>
+            ` : ''}
+          </div>
+        ` : ''}
 
         ${decision ? `
           <div class="test-status ${decision.action}">

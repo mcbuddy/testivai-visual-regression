@@ -472,8 +472,56 @@ export class ReportGenerator {
     const approvalsPath = path.join(outputDir, 'approvals.json');
     fs.writeFileSync(approvalsPath, JSON.stringify(approvalsData, null, 2));
 
+    // Write diffs.json for CI/CD integration
+    this.writeDiffsJson(outputDir, reportData);
+
     // Embed data in HTML file to avoid CORS issues when viewing locally
     this.embedDataInHtml(outputDir, reportData, historyData || { maxHistory: 5, commits: [] }, approvalsData);
+  }
+
+  /**
+   * Write a simplified diffs.json file for CI/CD integration
+   * This file is designed to be easily parsed by GitHub Actions to determine if there are any differences
+   */
+  private writeDiffsJson(outputDir: string, reportData: ReportData): void {
+    // Create diffs directory if it doesn't exist
+    const diffsDir = path.join(outputDir, 'diffs');
+    if (!fs.existsSync(diffsDir)) {
+      fs.mkdirSync(diffsDir, { recursive: true });
+    }
+
+    // Extract tests with differences
+    const testsWithDiffs = reportData.tests.filter(test => 
+      test.status === 'changed' || test.status === 'failed' || test.status === 'new'
+    );
+
+    // Create a simplified structure for CI/CD integration
+    const diffsData = {
+      summary: {
+        totalTests: reportData.metadata.totalTests,
+        passedTests: reportData.metadata.passedTests,
+        changedTests: reportData.metadata.changedTests,
+        newTests: reportData.tests.filter(t => t.status === 'new').length,
+        deletedTests: reportData.tests.filter(t => t.status === 'deleted').length,
+        hasDifferences: testsWithDiffs.length > 0
+      },
+      testsWithDifferences: testsWithDiffs.map(test => ({
+        name: test.name,
+        status: test.status,
+        diffPercentage: test.diffPercentage,
+        diffPixels: test.diffPixels,
+        baseline: test.baseline,
+        current: test.current,
+        diff: test.diff
+      })),
+      gitInfo: reportData.metadata.gitInfo,
+      generatedAt: reportData.metadata.generatedAt,
+      prInfo: reportData.metadata.prInfo
+    };
+
+    // Write diffs.json
+    const diffsPath = path.join(diffsDir, 'diffs.json');
+    fs.writeFileSync(diffsPath, JSON.stringify(diffsData, null, 2));
   }
 
   /**
