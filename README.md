@@ -35,20 +35,6 @@ npm install -g testivai-cli
 - Update baselines with `--update-baselines`
 - Comprehensive help system
 
-### 💎 [testivai-ruby](./packages/testivai-ruby)
-
-Ruby gem for testivAI Visual Regression that integrates with RSpec and Capybara.
-
-```ruby
-gem 'testivai-ruby'
-```
-
-**Features:**
-- RSpec integration with custom matchers
-- Capybara support for browser automation
-- Remote debugging port connection
-- Flexible configuration options
-
 ## Quick Start
 
 ### 1. Install the CLI (optional)
@@ -156,11 +142,10 @@ npm run lint
 
 ## Supported Testing Frameworks
 
-- **Playwright** - Full support with native integration
-- **Cypress** - Custom commands and plugin architecture
-- **Puppeteer** - Page event listeners and custom hooks
-- **Selenium** - WebDriver extensions and event listeners
-- **RSpec/Capybara** - Ruby integration via testivai-ruby gem
+- **Playwright** - Full support with native integration (Done)
+- **Cypress** - Custom commands and plugin architecture (WIP)
+- **Puppeteer** - Page event listeners and custom hooks (WIP)
+- **Selenium** - WebDriver extensions and event listeners (WIP)
 
 ## Features
 
@@ -186,7 +171,6 @@ npm run lint
 
 - [SDK Documentation](./packages/testivai-visual-regression/README.md)
 - [CLI Documentation](./packages/testivai-cli/README.md)
-- [Ruby Gem Documentation](./packages/testivai-ruby/README.md)
 - [Publishing Guide](./PUBLISHING.md)
 
 ## Contributing
