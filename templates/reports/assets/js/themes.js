@@ -201,8 +201,8 @@ class ThemeManager {
 const themeManager = new ThemeManager();
 
 // Export for use in other scripts
-window.testivAI = window.testivAI || {};
-window.testivAI.themeManager = themeManager;
+window.testivai = window.testivai || {};
+window.testivai.themeManager = themeManager;
 
 // CSS for theme toast (injected dynamically)
 const themeToastStyles = `

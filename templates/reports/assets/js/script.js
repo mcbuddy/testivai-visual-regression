@@ -272,7 +272,7 @@ class ReportManager {
           ${commit.summary.accepted > 0 ? `<span class="history-stat accepted">${commit.summary.accepted} accepted</span>` : ''}
           ${commit.summary.rejected > 0 ? `<span class="history-stat rejected">${commit.summary.rejected} rejected</span>` : ''}
         </div>
-        <button class="revert-btn" onclick="window.testivAI.reportManager.revertToCommit('${commit.shortSha}')">
+        <button class="revert-btn" onclick="window.testivai.reportManager.revertToCommit('${commit.shortSha}')">
           <svg class="revert-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polyline points="1,4 1,10 7,10" stroke="currentColor" stroke-width="2"/>
             <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2"/>
@@ -305,7 +305,7 @@ class ReportManager {
   revertToCommit(shortSha) {
     const commit = this.historyData.commits.find(c => c.shortSha === shortSha);
     if (!commit) {
-      window.testivAI.componentManager.showToast('Commit not found in history', 'error');
+      window.testivai.componentManager.showToast('Commit not found in history', 'error');
       return;
     }
 
@@ -323,14 +323,14 @@ class ReportManager {
 
   simulateRevert(commit) {
     // Simulate revert process
-    window.testivAI.componentManager.showToast(
+    window.testivai.componentManager.showToast(
       `Reverting to commit ${commit.shortSha}...`, 
       'info', 
       2000
     );
 
     setTimeout(() => {
-      window.testivAI.componentManager.showToast(
+      window.testivai.componentManager.showToast(
         `Successfully reverted to commit ${commit.shortSha}`, 
         'success'
       );
@@ -487,7 +487,7 @@ class ReportManager {
         ${showActions ? `
           <div class="test-actions">
             <button class="test-action-btn accept" 
-                    onclick="window.testivAI.reportManager.approveTest('${test.name}')"
+                    onclick="window.testivai.reportManager.approveTest('${test.name}')"
                     ${decision?.action === 'accept' ? 'disabled' : ''}>
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <polyline points="20,6 9,17 4,12" stroke="currentColor" stroke-width="2"/>
@@ -496,7 +496,7 @@ class ReportManager {
             </button>
             
             <button class="test-action-btn reject" 
-                    onclick="window.testivAI.reportManager.rejectTest('${test.name}')"
+                    onclick="window.testivai.reportManager.rejectTest('${test.name}')"
                     ${decision?.action === 'reject' ? 'disabled' : ''}>
               <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
@@ -507,7 +507,7 @@ class ReportManager {
 
             ${decision ? `
               <button class="test-action-btn revert" 
-                      onclick="window.testivAI.reportManager.revertDecision('${test.name}')">
+                      onclick="window.testivai.reportManager.revertDecision('${test.name}')">
                 <svg class="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <polyline points="1,4 1,10 7,10" stroke="currentColor" stroke-width="2"/>
                   <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" stroke="currentColor" stroke-width="2"/>
@@ -639,7 +639,7 @@ class ReportManager {
     this.renderTests(); // Re-render to update UI
     this.updateSummaryStats();
 
-    window.testivAI.componentManager.showToast(
+    window.testivai.componentManager.showToast(
       `Test "${testName}" ${action}ed`,
       action === 'accept' ? 'success' : 'warning',
       3000
@@ -667,7 +667,7 @@ class ReportManager {
       this.renderTests();
       this.updateSummaryStats();
 
-      window.testivAI.componentManager.showToast(
+      window.testivai.componentManager.showToast(
         `Decision for "${testName}" reverted`,
         'info',
         3000
@@ -783,7 +783,7 @@ class ReportManager {
          this.approvalsData.rejected.length === 0 && 
          this.approvalsData.new.length === 0 && 
          this.approvalsData.deleted.length === 0))) {
-      window.testivAI.componentManager.showToast(
+      window.testivai.componentManager.showToast(
         'No decisions to export',
         'warning'
       );
@@ -823,7 +823,7 @@ class ReportManager {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    window.testivAI.componentManager.showToast(
+    window.testivai.componentManager.showToast(
       'Approvals exported successfully',
       'success'
     );
@@ -847,8 +847,8 @@ class ReportManager {
 const reportManager = new ReportManager();
 
 // Export for use in other scripts
-window.testivAI = window.testivAI || {};
-window.testivAI.reportManager = reportManager;
+window.testivai = window.testivai || {};
+window.testivai.reportManager = reportManager;
 
 // Global functions for inline event handlers
 window.approve = (testName) => reportManager.approveTest(testName);

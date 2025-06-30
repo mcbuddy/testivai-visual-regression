@@ -1,23 +1,39 @@
 {
   "name": "testivai",
-  "version": "1.0.0",
-  "description": "testivAI Visual Regression Testing - Monorepo",
-  "private": true,
-  "workspaces": [
-    "packages/*"
+  "version": "1.0.13",
+  "description": "CLI tool for testivAI Visual Regression testing",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "testivai": "dist/cli.js"
+  },
+  "files": [
+    "dist/**/*"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/testivai/testivai-visual-regression.git"
+  },
+  "homepage": "https://github.com/testivai/testivai-visual-regression#readme",
+  "bugs": {
+    "url": "https://github.com/testivai/testivai-visual-regression/issues"
+  },
   "scripts": {
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "test:watch": "npm run test:watch --workspaces",
-    "test:coverage": "npm run test:coverage --workspaces",
-    "lint": "npm run lint --workspaces",
-    "clean": "npm run clean --workspaces",
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint 'src/**/*.ts'",
+    "clean": "rimraf dist coverage",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
     "visual-regression",
     "testing",
+    "cli",
     "screenshot",
     "comparison",
     "playwright",
@@ -25,7 +41,7 @@
     "puppeteer",
     "selenium"
   ],
-  "author": "",
+  "author": "Budi Sugianto",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -36,5 +52,12 @@
     "rimraf": "^5.0.10",
     "ts-jest": "^29.3.4",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "glob": "^10.3.10",
+    "pngjs": "^7.0.0",
+    "pixelmatch": "^5.3.0",
+    "sharp": "^0.34.2"
   }
 }

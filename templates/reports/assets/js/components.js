@@ -150,7 +150,7 @@ class ComponentManager {
       <div class="toast-content">
         <div class="toast-message">${message}</div>
       </div>
-      <button class="toast-close" onclick="window.testivAI.componentManager.closeToast('${toastId}')">
+      <button class="toast-close" onclick="window.testivai.componentManager.closeToast('${toastId}')">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
           <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
@@ -323,13 +323,13 @@ class ComponentManager {
             </div>
             <p>Select an action to apply to all selected tests:</p>
             <div class="bulk-actions">
-              <button class="btn btn-success" onclick="window.testivAI.componentManager.bulkApprove()">
+              <button class="btn btn-success" onclick="window.testivai.componentManager.bulkApprove()">
                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <polyline points="20,6 9,17 4,12" stroke="currentColor" stroke-width="2"/>
                 </svg>
                 Accept All Selected
               </button>
-              <button class="btn btn-danger" onclick="window.testivAI.componentManager.bulkReject()">
+              <button class="btn btn-danger" onclick="window.testivai.componentManager.bulkReject()">
                 <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2"/>
                   <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2"/>
@@ -350,7 +350,7 @@ class ComponentManager {
     selectedTests.forEach(checkbox => {
       const testCard = checkbox.closest('.test-card');
       if (testCard) {
-        window.testivAI.reportManager.approveTest(testCard.dataset.testName);
+        window.testivai.reportManager.approveTest(testCard.dataset.testName);
         count++;
       }
     });
@@ -366,7 +366,7 @@ class ComponentManager {
     selectedTests.forEach(checkbox => {
       const testCard = checkbox.closest('.test-card');
       if (testCard) {
-        window.testivAI.reportManager.rejectTest(testCard.dataset.testName);
+        window.testivai.reportManager.rejectTest(testCard.dataset.testName);
         count++;
       }
     });
@@ -483,8 +483,8 @@ class ComponentManager {
 const componentManager = new ComponentManager();
 
 // Export for use in other scripts
-window.testivAI = window.testivAI || {};
-window.testivAI.componentManager = componentManager;
+window.testivai = window.testivai || {};
+window.testivai.componentManager = componentManager;
 
 // Global functions for inline event handlers
 window.closeBulkModal = () => componentManager.closeModal('bulk-modal');

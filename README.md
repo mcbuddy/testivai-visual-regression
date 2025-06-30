@@ -1,95 +1,89 @@
 # testivAI Visual Regression
 
-A comprehensive TypeScript SDK and CLI for visual regression testing that integrates with multiple testing frameworks.
+A simple yet powerful CLI tool for visual regression testing that works with any testing framework.
 
-## Packages
-
-This monorepo contains the following packages:
-
-### 📦 [testivai-visual-regression](./packages/testivai-visual-regression)
-
-The core SDK for visual regression testing.
-
-```bash
-npm install testivai-visual-regression
-```
-
-**Features:**
-- Multi-framework support (Playwright, Cypress, Puppeteer, Selenium)
-- TypeScript support with comprehensive type definitions
-- Plugin architecture for framework-specific integrations
-- Cross-browser screenshot capture
-- Flexible configuration options
-
-### 🔧 [testivai-cli](./packages/testivai-cli)
-
-Command-line interface for testivAI Visual Regression.
+## 🔧 Installation
 
 ```bash
 npm install -g testivai-cli
 ```
 
-**Features:**
-- Initialize projects with `testivai init`
-- Compare screenshots with `testivai compare`
-- Update baselines with `--update-baselines`
-- Comprehensive help system
+## ✨ Features
 
-## Quick Start
+- **Simple CLI Interface**: Easy-to-use commands for visual regression testing
+- **Framework Agnostic**: Works with any testing framework that can capture screenshots
+- **Flexible Configuration**: Customizable thresholds, directories, and options
+- **HTML Reports**: Interactive reports for reviewing differences
+- **Git Integration**: Branch-based comparison workflows
 
-### 1. Install the CLI (optional)
+## 🚀 Quick Start in 5 Minutes
+
+### 1. Install testivai
 
 ```bash
 npm install -g testivai-cli
 ```
 
-### 2. Install the SDK
+### 2. Capture Baseline Screenshots
+
+Create a directory for your baseline screenshots:
 
 ```bash
-npm install testivai-visual-regression
+mkdir -p .testivai/baseline
 ```
 
-### 3. Initialize your project (using CLI)
+Place your baseline screenshots in this directory. You can capture these using any tool or framework (Playwright, Cypress, Puppeteer, Selenium, or even manual screenshots).
 
 ```bash
-testivai init --framework playwright
+# Example with Playwright
+npx playwright screenshot https://example.com .testivai/baseline/homepage.png
 ```
 
-### 4. Use in your tests (SDK)
+### 3. Run a Comparison Test
 
-```typescript
-import { test } from '@playwright/test';
-import { testivAI } from 'testivai-visual-regression';
-import { playwrightPlugin } from 'testivai-visual-regression/plugins/playwright';
-
-const visualTest = testivAI.init({
-  framework: 'playwright',
-  baselineDir: '.testivai/visual-regression/baseline'
-});
-
-visualTest.use(playwrightPlugin());
-
-test('homepage visual test', async ({ page }) => {
-  await page.goto('https://example.com');
-  await visualTest.capture('homepage', page);
-});
-```
-
-### 5. Compare results (using CLI)
+After making changes to your application, capture new screenshots for comparison:
 
 ```bash
-testivai compare
+mkdir -p .testivai/compare
+npx playwright screenshot https://example.com .testivai/compare/homepage.png
 ```
+
+Then run the comparison:
+
+```bash
+testivai compare --baseline-dir .testivai/baseline --compare-dir .testivai/compare
+```
+
+This will:
+- Compare all screenshots in the compare directory against their baseline versions
+- Generate diff images highlighting the differences
+- Create an HTML report showing the results
+
+### 4. Approve Changes
+
+If the changes are expected and you want to update your baselines:
+
+```bash
+testivai compare --baseline-dir .testivai/baseline --compare-dir .testivai/compare --update-baselines
+```
+
+This will replace your baseline screenshots with the new versions, making them the new reference point for future comparisons.
 
 ## Architecture
 
 ```
 testivai/
-├── packages/
-│   ├── testivai-visual-regression/     # Core SDK: capture, compare, plugins
-│   └── testivai-cli/                   # CLI layer that calls into SDK
+├── src/                               # Source code
+│   ├── cli.ts                         # CLI entry point
+│   ├── commands.ts                    # Command implementations
+│   ├── interfaces.ts                  # TypeScript interfaces
+│   ├── utils.ts                       # Utility functions
+│   └── types.d.ts                     # Type declarations
+├── test/                              # Test files
+├── dist/                              # Compiled JavaScript
 ├── .gitignore
-├── package.json (root, with workspaces config)
+├── package.json
+├── tsconfig.json
 └── README.md
 ```
 
@@ -117,27 +111,36 @@ The combination of Cline and Claude enables rapid development, comprehensive tes
 git clone <repository-url>
 cd testivai
 
-# Install dependencies for all packages
+# Install dependencies
 npm install
 
-# Build all packages
+# Build the project
 npm run build
 
-# Run tests for all packages
+# Run tests
 npm test
 ```
 
-### Working with Packages
+### Development Commands
 
 ```bash
-# Build specific package
-npm run build --workspace=packages/testivai-visual-regression
+# Build the project
+npm run build
 
-# Test specific package
-npm run test --workspace=packages/testivai-cli
+# Run tests
+npm run test
 
-# Lint all packages
+# Run tests with watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+
+# Lint the code
 npm run lint
+
+# Clean build artifacts
+npm run clean
 ```
 
 ## Supported Testing Frameworks
@@ -149,29 +152,24 @@ npm run lint
 
 ## Features
 
-### Core SDK Features
+### Key Features
 
-- 🎯 **Multi-Framework Support**: Works seamlessly with popular testing frameworks
-- 🔧 **Plugin Architecture**: Extensible system for framework-specific integrations
-- 📸 **Cross-Browser Screenshots**: Consistent capture across different browsers
-- ⚙️ **Flexible Configuration**: Customizable thresholds, directories, and options
+- 🎯 **Framework Agnostic**: Works with screenshots from any testing tool
+- 📸 **Pixel-Perfect Comparison**: Accurate image diffing with customizable thresholds
+- ⚙️ **Flexible Configuration**: Customizable directories, thresholds, and options
+- 📊 **HTML Reports**: Interactive reports for reviewing differences
+- 🔄 **Git Integration**: Branch-based comparison workflows
 - 📝 **TypeScript Support**: Full type safety and IntelliSense support
-- 🔄 **Git Integration**: Branch-based comparison workflows (planned)
-- 📊 **HTML Reports**: Interactive reports for reviewing differences (planned)
-
-### CLI Features
-
 - 🚀 **Quick Setup**: Initialize projects with a single command
 - 📋 **Comprehensive Commands**: Init, compare, and help commands
-- ⚙️ **Flexible Options**: Customizable settings for different workflows
 - 🎨 **Colored Output**: Enhanced terminal experience with chalk
 - 📖 **Built-in Help**: Detailed help for all commands and options
 
 ## Documentation
 
-- [SDK Documentation](./packages/testivai-visual-regression/README.md)
-- [CLI Documentation](./packages/testivai-cli/README.md)
 - [Publishing Guide](./PUBLISHING.md)
+- [Diffs JSON Format](./DIFFS_JSON_FORMAT.md)
+- [Migration Guide](./MIGRATION.md)
 
 ## Contributing
 
@@ -190,5 +188,5 @@ MIT
 
 For issues and questions:
 - Create an issue in this repository
-- Check the documentation in each package
-- Review the examples in the package READMEs
+- Check the documentation files
+- Review the examples in the test files
