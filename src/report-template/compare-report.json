@@ -1,0 +1,224 @@
+{
+  "metadata": {
+    "generatedAt": "2025-06-16T22:15:00Z",
+    "gitInfo": {
+      "sha": "abc123def4567890abcdef1234567890abcdef12",
+      "shortSha": "abc123d",
+      "author": "mcbuddy",
+      "email": "mcbuddy@example.com",
+      "date": "2025-06-13T20:15:00Z",
+      "message": "feat: update login form styling",
+      "branch": "feature/login-ui"
+    },
+    "totalTests": 5,
+    "changedTests": 1,
+    "passedTests": 2,
+    "framework": "playwright",
+    "testivaiVersion": "1.0.0",
+    "prInfo": {
+      "number": "42",
+      "url": "https://github.com/testivai/testivai-visual-regression/pull/42",
+      "commitSha": "abc123def4567890abcdef1234567890abcdef12",
+      "commitUrl": "https://github.com/testivai/testivai-visual-regression/commit/abc123def4567890abcdef1234567890abcdef12"
+    }
+  },
+  "tests": [
+    {
+      "name": "login.png",
+      "baseline": "baseline/login.png",
+      "current": "current/login.png",
+      "diff": null,
+      "status": "passed",
+      "approvalStatus": "approved",
+      "diffPercentage": 0,
+      "diffPixels": 0,
+      "dimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "testInfo": {
+        "framework": "playwright",
+        "viewport": "1280x800",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    },
+    {
+      "name": "header.png",
+      "baseline": "baseline/header.png",
+      "current": "current/header.png",
+      "diff": null,
+      "status": "passed",
+      "approvalStatus": "approved",
+      "diffPercentage": 0,
+      "diffPixels": 0,
+      "dimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "testInfo": {
+        "framework": "playwright",
+        "viewport": "1280x800",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    },
+    {
+      "name": "settings.png",
+      "baseline": "baseline/settings.png",
+      "current": "current/settings.png",
+      "diff": "diff/settings.diff.png",
+      "status": "changed",
+      "approvalStatus": "rejected",
+      "diffPercentage": 0.0234,
+      "diffPixels": 240,
+      "dimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "testInfo": {
+        "framework": "playwright",
+        "viewport": "1280x800",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    },
+    {
+      "name": "signup.png",
+      "baseline": "",
+      "current": "current/signup.png",
+      "diff": null,
+      "status": "new",
+      "diffPercentage": 0,
+      "diffPixels": 0,
+      "dimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "testInfo": {
+        "framework": "playwright",
+        "viewport": "1280x800",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    },
+    {
+      "name": "old-dashboard.png",
+      "baseline": "baseline/old-dashboard.png",
+      "current": "",
+      "diff": null,
+      "status": "deleted",
+      "diffPercentage": 0,
+      "diffPixels": 0,
+      "dimensions": {
+        "width": 1280,
+        "height": 800
+      },
+      "testInfo": {
+        "framework": "playwright",
+        "viewport": "1280x800",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    }
+  ],
+  "groupedTests": {
+    "approved": [
+      {
+        "name": "login.png",
+        "baseline": "baseline/login.png",
+        "current": "current/login.png",
+        "diff": null,
+        "status": "passed",
+        "approvalStatus": "approved",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      },
+      {
+        "name": "header.png",
+        "baseline": "baseline/header.png",
+        "current": "current/header.png",
+        "diff": null,
+        "status": "passed",
+        "approvalStatus": "approved",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "rejected": [
+      {
+        "name": "settings.png",
+        "baseline": "baseline/settings.png",
+        "current": "current/settings.png",
+        "diff": "diff/settings.diff.png",
+        "status": "changed",
+        "approvalStatus": "rejected",
+        "diffPercentage": 0.0234,
+        "diffPixels": 240,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "new": [
+      {
+        "name": "signup.png",
+        "baseline": "",
+        "current": "current/signup.png",
+        "diff": null,
+        "status": "new",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "deleted": [
+      {
+        "name": "old-dashboard.png",
+        "baseline": "baseline/old-dashboard.png",
+        "current": "",
+        "diff": null,
+        "status": "deleted",
+        "diffPercentage": 0,
+        "diffPixels": 0,
+        "dimensions": {
+          "width": 1280,
+          "height": 800
+        },
+        "testInfo": {
+          "framework": "playwright",
+          "viewport": "1280x800",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      }
+    ],
+    "pending": []
+  }
+}
