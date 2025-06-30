@@ -32,7 +32,7 @@ Create a directory for your baseline screenshots:
 mkdir -p .testivai/baseline
 ```
 
-Place your baseline screenshots in this directory. You can capture these using any tool or framework (Playwright, Cypress, Puppeteer, Selenium, or even manual screenshots).
+Place your baseline screenshots in this directory. You can capture these using Playwright and manual screenshots.
 
 ```bash
 # Example with Playwright
