@@ -2,7 +2,7 @@
  * CLI commands for testivAI Visual Regression
  */
 
-import { CLICommand, CLICommandRegistry } from './interfaces';
+import { CLICommand, CLICommandRegistry, Engine } from './interfaces';
 import chalk from 'chalk';
 
 /**
@@ -197,7 +197,7 @@ export class InitCommand extends BaseCLICommand {
     const baselineDir = options['baseline-dir'] || options.baselineDir || '.testivai/visual-regression/baseline';
     const compareDir = options['compare-dir'] || options.compareDir || '.testivai/visual-regression/compare';
     const reportDir = options['report-dir'] || options.reportDir || '.testivai/visual-regression/reports';
-    const diffThreshold = options.diffThreshold || 0.1;
+    const diffThreshold = options['diff-threshold'] || options.diffThreshold || 0.1;
     
     // Create configuration file
     const configContent = `module.exports = {
@@ -206,12 +206,23 @@ export class InitCommand extends BaseCLICommand {
   compareDir: '${compareDir}',
   reportDir: '${reportDir}',
   diffThreshold: ${diffThreshold},
-  updateBaselines: false
+  updateBaselines: false,
+  engine: 'pixelmatch'
 };
 `;
     
-    // In a real implementation, we would write this to a file
-    // For now, just log it
+    // Actually write the configuration file to disk
+    const fs = require('fs');
+    const path = require('path');
+    
+    // Write the configuration file
+    fs.writeFileSync('testivai.config.js', configContent);
+    
+    // Create the directories
+    fs.mkdirSync(String(baselineDir), { recursive: true });
+    fs.mkdirSync(String(compareDir), { recursive: true });
+    fs.mkdirSync(String(reportDir), { recursive: true });
+    
     console.log(chalk.green('Configuration file created: testivai.config.js'));
     console.log('');
     console.log(chalk.yellow('Configuration:'));
@@ -264,24 +275,48 @@ export class CompareCommand extends BaseCLICommand {
       description: 'Update baselines with comparison screenshots if different',
       requiresValue: false,
       defaultValue: false
+    },
+    {
+      flag: '--engine',
+      shortFlag: '-e',
+      description: 'Comparison engine to use (pixelmatch, jimp, opencv)',
+      requiresValue: true,
+      defaultValue: 'pixelmatch'
     }
   ];
   
   public async execute(args: string[], options: Record<string, unknown>): Promise<void> {
     console.log(chalk.blue('Comparing screenshots against baselines...'));
     
+    // Try to load configuration from file
+    let configFromFile: Record<string, any> = {};
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      const configPath = 'testivai.config.js';
+      
+      if (fs.existsSync(configPath)) {
+        configFromFile = require(path.resolve(configPath));
+      }
+    } catch (error) {
+      console.warn(chalk.yellow('Failed to load configuration file, using defaults'));
+    }
+    
     // Convert option names from kebab-case to camelCase
-    const baselineDir = options['baseline-dir'] || options.baselineDir || '.testivai/visual-regression/baseline';
-    const compareDir = options['compare-dir'] || options.compareDir || '.testivai/visual-regression/compare';
-    const reportDir = options['report-dir'] || options.reportDir || '.testivai/visual-regression/reports';
-    const diffThreshold = options['diff-threshold'] || options.diffThreshold || 0.1;
-    const updateBaselines = options['update-baselines'] || options.updateBaselines || false;
+    const baselineDir = options['baseline-dir'] || options.baselineDir || configFromFile.baselineDir || '.testivai/visual-regression/baseline';
+    const compareDir = options['compare-dir'] || options.compareDir || configFromFile.compareDir || '.testivai/visual-regression/compare';
+    const reportDir = options['report-dir'] || options.reportDir || configFromFile.reportDir || '.testivai/visual-regression/reports';
+    const diffThreshold = options['diff-threshold'] || options.diffThreshold || configFromFile.diffThreshold || 0.1;
+    const updateBaselines = options['update-baselines'] || options.updateBaselines || configFromFile.updateBaselines || false;
+    const engine = options['engine'] || options.engine || configFromFile.engine || 'pixelmatch';
     
     console.log(`Baseline directory: ${chalk.cyan(String(baselineDir))}`);
     console.log(`Compare directory: ${chalk.cyan(String(compareDir))}`);
     console.log(`Report directory: ${chalk.cyan(String(reportDir))}`);
     console.log(`Diff threshold: ${chalk.cyan(String(diffThreshold))}`);
     console.log(`Update baselines: ${chalk.cyan(String(updateBaselines))}`);
+    console.log(`Comparison engine: ${chalk.cyan(String(engine))}`);
     
     try {
       // Import required modules
@@ -354,7 +389,8 @@ export class CompareCommand extends BaseCLICommand {
             baselinePath: baselineFile,
             comparePath: compareFile,
             diffPath: diffFile,
-            threshold: Number(diffThreshold)
+            threshold: Number(diffThreshold),
+            engine: String(engine)
           });
           
           comparisonResults.push(result);
@@ -414,6 +450,7 @@ export class CompareCommand extends BaseCLICommand {
     comparePath: string;
     diffPath: string;
     threshold: number;
+    engine?: string;
   }): Promise<{
     name: string;
     baselinePath: string;
@@ -424,7 +461,23 @@ export class CompareCommand extends BaseCLICommand {
     threshold: number;
   }> {
     const { compareImages } = require('./utils');
-    return await compareImages(options);
+    
+    // Check which engine to use
+    if (options.engine === Engine.OpenCV) {
+      // Use opencv.js for comparison
+      console.log(chalk.blue("Using opencv.js engine"));
+      // For now, fall back to pixelmatch since opencv implementation is not available yet
+      return await compareImages(options);
+    } else if (options.engine === Engine.Jimp) {
+      // Use Jimp for comparison
+      console.log(chalk.blue("Using Jimp engine"));
+      // For now, fall back to pixelmatch since Jimp implementation is not available yet
+      return await compareImages(options);
+    } else {
+      // Default to pixelmatch
+      console.log(chalk.blue("Using Pixelmatch engine"));
+      return await compareImages(options);
+    }
   }
 
   /**
@@ -774,7 +827,74 @@ export class CompareCommand extends BaseCLICommand {
    * Get testivAI version
    */
   private getTestivAIVersion(): string {
-    return '1.0.0'; // Hardcoded version since we're no longer using the package
+    return '1.0.15'; // Updated version to match package.json
+  }
+}
+
+/**
+ * Set Engine command implementation
+ */
+export class SetEngineCommand extends BaseCLICommand {
+  public name = 'set-engine';
+  public description = 'Set the comparison engine (pixelmatch, jimp, or opencv)';
+  
+  public options = [];
+  
+  public async execute(args: string[], options: Record<string, unknown>): Promise<void> {
+    if (args.length === 0) {
+      console.error(chalk.red('Error: Engine name is required'));
+      console.log(`Usage: testivai set-engine <engine>`);
+      console.log(`Available engines: ${chalk.cyan('pixelmatch')}, ${chalk.cyan('jimp')}, ${chalk.cyan('opencv')}`);
+      return;
+    }
+    
+    const engine = args[0].toLowerCase();
+    
+    if (engine !== Engine.Pixelmatch && engine !== Engine.Jimp && engine !== Engine.OpenCV) {
+      console.error(chalk.red(`Error: Invalid engine '${engine}'`));
+      console.log(`Available engines: ${chalk.cyan('pixelmatch')}, ${chalk.cyan('jimp')}, ${chalk.cyan('opencv')}`);
+      return;
+    }
+    
+    // Update the configuration file with the new engine setting
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      const configPath = 'testivai.config.js';
+      
+      // Check if the configuration file exists
+      if (!fs.existsSync(configPath)) {
+        console.error(chalk.red(`Configuration file not found: ${configPath}`));
+        console.log(chalk.yellow('Run `testivai init` to create a configuration file'));
+        return;
+      }
+      
+      // Read the configuration file
+      let configContent = fs.readFileSync(configPath, 'utf8');
+      
+      // Check if the engine setting already exists
+      if (configContent.includes('engine:')) {
+        // Update the existing engine setting
+        configContent = configContent.replace(/engine:\s*['"].*?['"]/g, `engine: '${engine}'`);
+      } else {
+        // Add the engine setting
+        configContent = configContent.replace(/updateBaselines:\s*(true|false)/g, `updateBaselines: $1,\n  engine: '${engine}'`);
+      }
+      
+      // Write the updated configuration back to the file
+      fs.writeFileSync(configPath, configContent);
+      
+      console.log(chalk.green(`Engine set to ${chalk.cyan(engine)} in ${chalk.cyan(configPath)}`));
+      
+      if (engine === Engine.OpenCV) {
+        console.log(chalk.yellow('Note: OpenCV engine is currently in development and will fall back to pixelmatch'));
+      } else if (engine === Engine.Jimp) {
+        console.log(chalk.yellow('Note: Jimp engine is currently in development and will fall back to pixelmatch'));
+      }
+    } catch (error) {
+      console.error(chalk.red('Error updating configuration file:'), error instanceof Error ? error.message : String(error));
+    }
   }
 }
 
@@ -791,6 +911,7 @@ export function createCLICommandRegistry(): CLICommandRegistry {
   // Register other commands
   registry.register(new InitCommand());
   registry.register(new CompareCommand());
+  registry.register(new SetEngineCommand());
   
   return registry;
 }

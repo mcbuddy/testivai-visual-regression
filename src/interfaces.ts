@@ -3,6 +3,15 @@
  */
 
 /**
+ * Image comparison engine options
+ */
+export enum Engine {
+  Pixelmatch = "pixelmatch",
+  Jimp = "jimp",
+  OpenCV = "opencv",
+}
+
+/**
  * CLI command option interface
  */
 export interface CLICommandOption {

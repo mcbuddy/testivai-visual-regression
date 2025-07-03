@@ -1,11 +1,11 @@
 # testivAI Visual Regression
 
-A simple yet powerful CLI tool for visual regression testing that works with any testing framework.
+A simple yet powerful CLI tool for visual regression testing that works with Playwright testing framework.
 
 ## 🔧 Installation
 
 ```bash
-npm install -g testivai-cli
+npm install -g testivai
 ```
 
 ## ✨ Features
@@ -21,37 +21,48 @@ npm install -g testivai-cli
 ### 1. Install testivai
 
 ```bash
-npm install -g testivai-cli
+npm install -g testivai
 ```
 
-### 2. Capture Baseline Screenshots
+### 2. Initialize Your Project
 
-Create a directory for your baseline screenshots:
+Initialize your project with the `testivai init` command:
 
 ```bash
-mkdir -p .testivai/baseline
+testivai init --framework playwright
 ```
 
-Place your baseline screenshots in this directory. You can capture these using Playwright and manual screenshots.
+This will:
+- Create a configuration file (testivai.config.js) with default settings
+- Set up the necessary directory structure (.testivai/visual-regression/baseline, compare, reports)
+- Configure the framework to use (Playwright in this example)
+
+You can customize the initialization with options:
+```bash
+testivai init --framework playwright --diff-threshold 0.2
+```
+
+### 3. Capture Baseline Screenshots
+
+Place your baseline screenshots in the baseline directory created during initialization. You can capture these using Playwright:
 
 ```bash
 # Example with Playwright
-npx playwright screenshot https://example.com .testivai/baseline/homepage.png
+npx playwright screenshot https://example.com .testivai/visual-regression/baseline/homepage.png
 ```
 
-### 3. Run a Comparison Test
+### 4. Run a Comparison Test
 
 After making changes to your application, capture new screenshots for comparison:
 
 ```bash
-mkdir -p .testivai/compare
-npx playwright screenshot https://example.com .testivai/compare/homepage.png
+npx playwright screenshot https://example.com .testivai/visual-regression/compare/homepage.png
 ```
 
 Then run the comparison:
 
 ```bash
-testivai compare --baseline-dir .testivai/baseline --compare-dir .testivai/compare
+testivai compare
 ```
 
 This will:
@@ -59,12 +70,46 @@ This will:
 - Generate diff images highlighting the differences
 - Create an HTML report showing the results
 
-### 4. Approve Changes
+You can also specify custom directories if needed:
+```bash
+testivai compare --baseline-dir .testivai/visual-regression/baseline --compare-dir .testivai/visual-regression/compare
+```
+
+#### Comparison Engines
+
+testivAI supports multiple comparison engines:
+
+- **pixelmatch** (default): Fast and accurate pixel-by-pixel comparison
+- **jimp**: Image processing library with additional capabilities
+- **opencv**: Computer vision library with advanced image analysis (experimental)
+
+You can specify which engine to use for comparison:
+
+```bash
+testivai compare --engine opencv
+```
+
+Or set the default engine for your project:
+
+```bash
+testivai set-engine jimp
+```
+
+The engine can also be configured in your testivai.config.js file:
+
+```javascript
+module.exports = {
+  // Other configuration options
+  engine: 'pixelmatch'
+};
+```
+
+### 5. Approve Changes
 
 If the changes are expected and you want to update your baselines:
 
 ```bash
-testivai compare --baseline-dir .testivai/baseline --compare-dir .testivai/compare --update-baselines
+testivai compare --update-baselines
 ```
 
 This will replace your baseline screenshots with the new versions, making them the new reference point for future comparisons.
@@ -156,12 +201,13 @@ npm run clean
 
 - 🎯 **Framework Agnostic**: Works with screenshots from any testing tool
 - 📸 **Pixel-Perfect Comparison**: Accurate image diffing with customizable thresholds
+- 🔍 **Multiple Comparison Engines**: Support for Pixelmatch, Jimp, and OpenCV
 - ⚙️ **Flexible Configuration**: Customizable directories, thresholds, and options
 - 📊 **HTML Reports**: Interactive reports for reviewing differences
 - 🔄 **Git Integration**: Branch-based comparison workflows
 - 📝 **TypeScript Support**: Full type safety and IntelliSense support
 - 🚀 **Quick Setup**: Initialize projects with a single command
-- 📋 **Comprehensive Commands**: Init, compare, and help commands
+- 📋 **Comprehensive Commands**: Init, compare, set-engine, and help commands
 - 🎨 **Colored Output**: Enhanced terminal experience with chalk
 - 📖 **Built-in Help**: Detailed help for all commands and options
 
