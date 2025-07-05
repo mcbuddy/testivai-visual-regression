@@ -4,6 +4,7 @@
 
 import { CLICommand, CLICommandRegistry, Engine } from './interfaces';
 import chalk from 'chalk';
+import * as path from 'path';
 
 /**
  * Implementation of the CLI Command Registry
@@ -207,7 +208,8 @@ export class InitCommand extends BaseCLICommand {
   reportDir: '${reportDir}',
   diffThreshold: ${diffThreshold},
   updateBaselines: false,
-  engine: 'pixelmatch'
+  engine: 'pixelmatch',
+  defaultBranch: 'main'
 };
 `;
     
@@ -304,7 +306,14 @@ export class CompareCommand extends BaseCLICommand {
     }
     
     // Convert option names from kebab-case to camelCase
-    const baselineDir = options['baseline-dir'] || options.baselineDir || configFromFile.baselineDir || '.testivai/visual-regression/baseline';
+    const defaultBranch = configFromFile.defaultBranch || 'main';
+    let baselineDir = options['baseline-dir'] || options.baselineDir || configFromFile.baselineDir || '.testivai/visual-regression/baseline';
+    
+    // If baselineDir doesn't include the default branch, append it
+    if (!baselineDir.endsWith(defaultBranch) && !baselineDir.includes(`/${defaultBranch}/`)) {
+      baselineDir = path.join(baselineDir, defaultBranch);
+    }
+    
     const compareDir = options['compare-dir'] || options.compareDir || configFromFile.compareDir || '.testivai/visual-regression/compare';
     const reportDir = options['report-dir'] || options.reportDir || configFromFile.reportDir || '.testivai/visual-regression/reports';
     const diffThreshold = options['diff-threshold'] || options.diffThreshold || configFromFile.diffThreshold || 0.1;
@@ -827,7 +836,7 @@ export class CompareCommand extends BaseCLICommand {
    * Get testivAI version
    */
   private getTestivAIVersion(): string {
-    return '1.0.16'; // Updated version to match package.json
+    return '1.0.17'; // Updated version to match package.json
   }
 }
 
