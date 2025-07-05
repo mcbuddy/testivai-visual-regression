@@ -27,33 +27,12 @@ class ReportManager {
     try {
       this.showLoading(true);
       
-      // Load report data, history, and approvals in parallel
-      const [reportResponse, historyResponse, approvalsResponse] = await Promise.all([
-        fetch('compare-report.json'),
-        fetch('history.json'),
-        fetch('approvals.json')
-      ]);
-
-      if (!reportResponse.ok) {
-        throw new Error(`Failed to load report data: ${reportResponse.status}`);
-      }
-
-      this.reportData = await reportResponse.json();
-      
-      // History is optional
-      if (historyResponse.ok) {
-        this.historyData = await historyResponse.json();
-      } else {
-        console.warn('History data not available');
-        this.historyData = { maxHistory: 5, commits: [] };
-      }
-
-      // Approvals is optional
-      if (approvalsResponse.ok) {
-        this.approvalsData = await approvalsResponse.json();
-      } else {
-        console.warn('Approvals data not available');
-        this.approvalsData = { 
+      // Check if we have embedded data first
+      if (window.testivai && window.testivai.embeddedData) {
+        console.log('Using embedded data');
+        this.reportData = window.testivai.embeddedData.reportData;
+        this.historyData = window.testivai.embeddedData.historyData || { maxHistory: 5, commits: [] };
+        this.approvalsData = window.testivai.embeddedData.approvalsData || { 
           approved: [], 
           rejected: [], 
           new: [], 
@@ -63,6 +42,51 @@ class ReportManager {
             timestamp: new Date().toISOString()
           }
         };
+      } else {
+        // Fall back to fetching data if no embedded data is available
+        console.log('No embedded data found, fetching from files');
+        try {
+          // Load report data, history, and approvals in parallel
+          const [reportResponse, historyResponse, approvalsResponse] = await Promise.all([
+            fetch('compare-report.json'),
+            fetch('history.json'),
+            fetch('approvals.json')
+          ]);
+
+          if (!reportResponse.ok) {
+            throw new Error(`Failed to load report data: ${reportResponse.status}`);
+          }
+
+          this.reportData = await reportResponse.json();
+          
+          // History is optional
+          if (historyResponse.ok) {
+            this.historyData = await historyResponse.json();
+          } else {
+            console.warn('History data not available');
+            this.historyData = { maxHistory: 5, commits: [] };
+          }
+
+          // Approvals is optional
+          if (approvalsResponse.ok) {
+            this.approvalsData = await approvalsResponse.json();
+          } else {
+            console.warn('Approvals data not available');
+            this.approvalsData = { 
+              approved: [], 
+              rejected: [], 
+              new: [], 
+              deleted: [],
+              meta: {
+                author: this.reportData?.metadata?.gitInfo?.author || 'unknown',
+                timestamp: new Date().toISOString()
+              }
+            };
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          throw error; // Re-throw to be caught by the outer try/catch
+        }
       }
 
       // Load stored decisions
