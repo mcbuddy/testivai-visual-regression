@@ -827,7 +827,7 @@ export class CompareCommand extends BaseCLICommand {
    * Get testivAI version
    */
   private getTestivAIVersion(): string {
-    return '1.0.15'; // Updated version to match package.json
+    return '1.0.16'; // Updated version to match package.json
   }
 }
 
