@@ -36,6 +36,3 @@ Thumbs.db
 # testivAI specific
 .testivai/
 .testivai-cli/
-
-# Memory bank (local documentation)
-memory-bank/
